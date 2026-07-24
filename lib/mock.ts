@@ -36,6 +36,8 @@ export const BUILDING = {
   todayCount: 4,
   weeklyRate: 82,
   savedHoursWeek: 26, // AI 분류·자동 배정·리포트 자동화로 절감된 시간(주간)
+  savedTrend: [14, 17, 15, 19, 22, 20, 24, 26], // 최근 8주 절감시간
+  todayLabel: "7월 24일 목요일",
 };
 
 // 공개 요금표 — 국내 경쟁사 전원 가격 비공개·상담형인 시장에서 그 자체가 차별점
@@ -121,24 +123,24 @@ export const MENU_GROUPS = [
   {
     title: "일일 운영",
     items: [
-      { label: "이슈", desc: "긴급 상황 추적", ready: true },
-      { label: "알림", desc: "알람·시스템 알림 통합", ready: true },
+      { label: "이슈", desc: "긴급 상황 추적", ready: true, icon: "alert" },
+      { label: "알림", desc: "알람·시스템 알림 통합", ready: true, icon: "bell" },
     ],
   },
   {
     title: "자산 관리",
     items: [
-      { label: "건물·공간", desc: "빌딩 정보와 도면", ready: false },
-      { label: "설비·자산", desc: "설비 대장과 이력", ready: false },
-      { label: "예방정비", desc: "정기 점검 일정", ready: false },
-      { label: "법정점검", desc: "소방·승강기·전기 의무 점검", ready: false },
+      { label: "건물·공간", desc: "빌딩 정보와 도면", ready: false, icon: "building" },
+      { label: "설비·자산", desc: "설비 대장과 이력", ready: false, icon: "wrench" },
+      { label: "예방정비", desc: "정기 점검 일정", ready: false, icon: "calendar" },
+      { label: "법정점검", desc: "소방·승강기·전기 의무 점검", ready: false, icon: "shield" },
     ],
   },
   {
     title: "분석",
     items: [
-      { label: "통합관제", desc: "빌딩 전체 현황 대시보드", ready: false },
-      { label: "리포트", desc: "주간·월간 운영 보고서", ready: false },
+      { label: "통합관제", desc: "빌딩 전체 현황 대시보드", ready: false, icon: "chart" },
+      { label: "리포트", desc: "주간·월간 운영 보고서", ready: false, icon: "file" },
     ],
   },
 ] as const;

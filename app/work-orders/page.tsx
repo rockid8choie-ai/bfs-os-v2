@@ -15,8 +15,11 @@ const BADGE: Record<WoStatus, string> = {
   완료: "bg-emerald-50 text-emerald-600",
 };
 
+const FILTERS = ["전체", "대기", "진행중", "완료"] as const;
+
 export default function WorkOrdersPage() {
   const [orders, setOrders] = useState(WORK_ORDERS);
+  const [filter, setFilter] = useState<(typeof FILTERS)[number]>("전체");
 
   const advance = (id: string) =>
     setOrders((prev) =>
@@ -26,10 +29,14 @@ export default function WorkOrdersPage() {
     );
 
   const doneCount = orders.filter((o) => o.status === "완료").length;
+  const shown =
+    filter === "전체" ? orders : orders.filter((o) => o.status === filter);
 
   return (
     <div>
-      <h1 className="mt-3 text-[22px] font-bold tracking-tight">내 작업</h1>
+      <h1 className="mt-3 text-[24px] font-extrabold tracking-[-0.02em]">
+        내 작업
+      </h1>
       <p className="mt-1 text-sm text-sub">
         오늘 {orders.length}건 중{" "}
         <b className="text-ink">{doneCount}건</b> 완료
@@ -41,9 +48,27 @@ export default function WorkOrdersPage() {
         />
       </div>
 
-      <div className="mt-5 space-y-3">
-        {orders.map((o) => (
-          <div key={o.id} className="rounded-[20px] bg-card p-4">
+      <div className="mt-4 flex gap-1.5">
+        {FILTERS.map((f) => (
+          <button
+            key={f}
+            onClick={() => setFilter(f)}
+            className={`rounded-full px-3.5 py-1.5 text-[13px] font-bold transition-colors ${
+              filter === f ? "bg-ink text-white" : "bg-card text-sub"
+            }`}
+          >
+            {f}
+          </button>
+        ))}
+      </div>
+
+      <div className="mt-4 space-y-3">
+        {shown.map((o, i) => (
+          <div
+            key={o.id}
+            className="rise rounded-[20px] bg-card p-4"
+            style={{ animationDelay: `${i * 60}ms` }}
+          >
             <div className="flex items-start justify-between gap-2">
               <div className="min-w-0">
                 <div className="font-semibold leading-snug">{o.title}</div>

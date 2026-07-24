@@ -19,7 +19,7 @@ export default function VocPage() {
 
   return (
     <div>
-      <h1 className="mt-3 text-[22px] font-bold tracking-tight">민원</h1>
+      <h1 className="mt-3 text-[24px] font-extrabold tracking-[-0.02em]">민원</h1>
       <p className="mt-1 text-sm text-sub">
         새 민원{" "}
         <b className="text-ink">
@@ -29,8 +29,12 @@ export default function VocPage() {
       </p>
 
       <div className="mt-5 space-y-3">
-        {vocs.map((v) => (
-          <div key={v.id} className="rounded-[20px] bg-card p-4">
+        {vocs.map((v, i) => (
+          <div
+            key={v.id}
+            className="rise rounded-[20px] bg-card p-4"
+            style={{ animationDelay: `${i * 60}ms` }}
+          >
             <div className="flex items-start justify-between gap-2">
               <div className="min-w-0">
                 <div className="font-semibold leading-snug">“{v.title}”</div>

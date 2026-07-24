@@ -3,7 +3,7 @@ import { PLANS } from "@/lib/mock";
 export default function PricingPage() {
   return (
     <div>
-      <h1 className="mt-3 text-[22px] font-bold tracking-tight">요금</h1>
+      <h1 className="mt-3 text-[24px] font-extrabold tracking-[-0.02em]">요금</h1>
       <p className="mt-1 text-sm leading-relaxed text-sub">
         상담 없이 시작하세요 — 카드 등록하면 오늘부터.
         <br />
