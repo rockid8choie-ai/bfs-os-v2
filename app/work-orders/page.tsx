@@ -10,9 +10,9 @@ const NEXT: Record<WoStatus, { label: string; to: WoStatus } | null> = {
 };
 
 const BADGE: Record<WoStatus, string> = {
-  대기: "bg-slate-100 text-slate-600",
-  진행중: "bg-blue-50 text-brand",
-  완료: "bg-emerald-50 text-emerald-700",
+  대기: "bg-line text-ink2",
+  진행중: "bg-brand-soft text-brand",
+  완료: "bg-emerald-50 text-emerald-600",
 };
 
 export default function WorkOrdersPage() {
@@ -29,24 +29,25 @@ export default function WorkOrdersPage() {
 
   return (
     <div>
-      <h1 className="mt-2 text-xl font-bold">내 작업</h1>
+      <h1 className="mt-3 text-[22px] font-bold tracking-tight">내 작업</h1>
       <p className="mt-1 text-sm text-sub">
-        오늘 {orders.length}건 중 <b className="text-ink">{doneCount}건</b> 완료
+        오늘 {orders.length}건 중{" "}
+        <b className="text-ink">{doneCount}건</b> 완료
       </p>
-      <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-line">
+      <div className="mt-3 h-2 overflow-hidden rounded-full bg-card">
         <div
-          className="h-full rounded-full bg-brand transition-all"
+          className="h-full rounded-full bg-brand transition-all duration-500"
           style={{ width: `${(doneCount / orders.length) * 100}%` }}
         />
       </div>
 
-      <div className="mt-4 space-y-3">
+      <div className="mt-5 space-y-3">
         {orders.map((o) => (
-          <div key={o.id} className="rounded-2xl bg-card p-4 shadow-sm">
+          <div key={o.id} className="rounded-[20px] bg-card p-4">
             <div className="flex items-start justify-between gap-2">
               <div className="min-w-0">
                 <div className="font-semibold leading-snug">{o.title}</div>
-                <div className="mt-0.5 text-xs text-sub">
+                <div className="mt-0.5 text-[13px] text-sub">
                   {o.location} · 마감 {o.due} · {o.source}
                 </div>
               </div>
@@ -59,7 +60,7 @@ export default function WorkOrdersPage() {
             {NEXT[o.status] && (
               <button
                 onClick={() => advance(o.id)}
-                className="mt-3 w-full rounded-lg bg-brand py-2.5 text-sm font-bold text-white"
+                className="mt-3.5 w-full rounded-xl bg-brand py-3 text-sm font-bold text-white active:opacity-80"
               >
                 {NEXT[o.status]!.label}
               </button>

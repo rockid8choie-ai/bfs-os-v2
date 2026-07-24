@@ -35,7 +35,7 @@ export default function Fab() {
         <button
           aria-label="접수하기"
           onClick={() => setOpen(true)}
-          className="pointer-events-auto flex h-14 w-14 items-center justify-center rounded-full bg-brand text-3xl font-light text-white shadow-lg shadow-brand/40"
+          className="pointer-events-auto flex h-14 w-14 items-center justify-center rounded-full bg-brand text-3xl font-light text-white shadow-[0_8px_20px_rgba(49,130,246,0.4)] active:scale-95"
         >
           ＋
         </button>
@@ -44,7 +44,7 @@ export default function Fab() {
       {open && (
         <div className="fixed inset-0 z-40 flex items-end justify-center bg-black/50" onClick={reset}>
           <div
-            className="w-full max-w-md rounded-t-2xl bg-card p-5 pb-8"
+            className="w-full max-w-md rounded-t-3xl bg-page p-5 pb-8"
             onClick={(e) => e.stopPropagation()}
           >
             {!done ? (
@@ -53,7 +53,7 @@ export default function Fab() {
                 <p className="mt-1 text-sm text-sub">
                   사진 찍고 한 줄만 쓰면, 이슈·민원·작업 분류는 AI가 합니다.
                 </p>
-                <button className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-line py-6 text-sm text-sub">
+                <button className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-card py-6 text-sm text-sub">
                   📷 사진 추가 (베타에서는 생략 가능)
                 </button>
                 <textarea
@@ -67,7 +67,7 @@ export default function Fab() {
                   className="mt-3 w-full rounded-xl border border-line p-3 text-[15px] outline-none focus:border-brand"
                 />
                 {route && (
-                  <div className="mt-3 rounded-xl bg-page p-3 text-sm">
+                  <div className="mt-3 rounded-xl bg-card p-3 text-sm">
                     <span className="font-bold text-brand">
                       {route.icon} {route.type}
                     </span>

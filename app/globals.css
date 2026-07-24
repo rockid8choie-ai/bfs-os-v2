@@ -9,17 +9,21 @@
   font-display: swap;
 }
 
-/* Toss 디자인 시스템(TDS) 실측 팔레트 */
+/* 글로벌 모바일 UI 공통 문법(토스 TDS·Revolut·iOS HIG):
+   흰 베이스 + 그레이 카드(무그림자), 강조는 색이 아니라 위계로 */
 :root {
   --brand: #3182f6; /* Toss Blue 500 */
   --brand-deep: #191f28; /* Grey 900 */
-  --ink: #191f28;
-  --sub: #8b95a1; /* Grey 500 */
-  --line: #e5e8eb; /* Grey 200 */
-  --bg: #f2f4f6; /* Grey 100 */
-  --card: #ffffff;
-  --danger: #f04452; /* Toss Red */
   --brand-soft: #e8f3ff; /* Blue 50 */
+  --ink: #191f28;
+  --ink-2: #4e5968; /* Grey 700 — 보조 버튼 텍스트 */
+  --sub: #8b95a1; /* Grey 500 */
+  --mute: #b0b8c1; /* Grey 400 — 비활성 탭 */
+  --line: #f2f4f6; /* Grey 100 — 헤어라인 */
+  --bg: #ffffff; /* 앱 베이스 = 흰색 */
+  --card: #f7f8fa; /* 카드 = 라이트 그레이 (그림자 없음) */
+  --danger: #f04452; /* Toss Red */
+  --danger-soft: #fdeeee;
 }
 
 @theme inline {
@@ -27,11 +31,14 @@
   --color-brand-deep: var(--brand-deep);
   --color-brand-soft: var(--brand-soft);
   --color-ink: var(--ink);
+  --color-ink2: var(--ink-2);
   --color-sub: var(--sub);
+  --color-mute: var(--mute);
   --color-line: var(--line);
   --color-page: var(--bg);
   --color-card: var(--card);
   --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
 }
 
 html {
@@ -43,4 +50,11 @@ body {
   background: var(--bg);
   color: var(--ink);
   letter-spacing: -0.01em;
+}
+
+/* 데스크톱에서는 폰 프레임이 뜨도록 바깥 배경만 그레이 */
+@media (min-width: 768px) {
+  body {
+    background: #e9edf1;
+  }
 }

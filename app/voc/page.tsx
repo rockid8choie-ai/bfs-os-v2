@@ -4,9 +4,9 @@ import { useState } from "react";
 import { VOCS } from "@/lib/mock";
 
 const BADGE: Record<string, string> = {
-  접수: "bg-amber-50 text-amber-700",
-  처리중: "bg-blue-50 text-brand",
-  완료: "bg-emerald-50 text-emerald-700",
+  접수: "bg-amber-50 text-amber-600",
+  처리중: "bg-brand-soft text-brand",
+  완료: "bg-emerald-50 text-emerald-600",
 };
 
 export default function VocPage() {
@@ -19,19 +19,22 @@ export default function VocPage() {
 
   return (
     <div>
-      <h1 className="mt-2 text-xl font-bold">민원</h1>
+      <h1 className="mt-3 text-[22px] font-bold tracking-tight">민원</h1>
       <p className="mt-1 text-sm text-sub">
-        새 민원 <b className="text-ink">{vocs.filter((v) => v.status === "접수").length}건</b>{" "}
+        새 민원{" "}
+        <b className="text-ink">
+          {vocs.filter((v) => v.status === "접수").length}건
+        </b>{" "}
         — AI가 유형을 미리 분류해뒀어요
       </p>
 
-      <div className="mt-4 space-y-3">
+      <div className="mt-5 space-y-3">
         {vocs.map((v) => (
-          <div key={v.id} className="rounded-2xl bg-card p-4 shadow-sm">
+          <div key={v.id} className="rounded-[20px] bg-card p-4">
             <div className="flex items-start justify-between gap-2">
               <div className="min-w-0">
                 <div className="font-semibold leading-snug">“{v.title}”</div>
-                <div className="mt-0.5 text-xs text-sub">
+                <div className="mt-0.5 text-[13px] text-sub">
                   {v.tenant} · {v.createdAt} ·{" "}
                   <span className="font-semibold text-brand">AI: {v.aiTag}</span>
                 </div>
@@ -45,7 +48,7 @@ export default function VocPage() {
             {v.status === "접수" && (
               <button
                 onClick={() => toWork(v.id)}
-                className="mt-3 w-full rounded-lg bg-brand py-2.5 text-sm font-bold text-white"
+                className="mt-3.5 w-full rounded-xl bg-brand py-3 text-sm font-bold text-white active:opacity-80"
               >
                 작업 지시로 전환
               </button>
