@@ -1,0 +1,33 @@
+@import "tailwindcss";
+
+:root {
+  --brand: #0d3aa6;
+  --brand-deep: #0e1b30;
+  --ink: #1a2332;
+  --sub: #5b6676;
+  --line: #e5e9f0;
+  --bg: #f4f6f9;
+  --card: #ffffff;
+  --danger: #dc2626;
+}
+
+@theme inline {
+  --color-brand: var(--brand);
+  --color-brand-deep: var(--brand-deep);
+  --color-ink: var(--ink);
+  --color-sub: var(--sub);
+  --color-line: var(--line);
+  --color-page: var(--bg);
+  --color-card: var(--card);
+  --color-danger: var(--danger);
+}
+
+html {
+  font-family: "Pretendard Variable", Pretendard, "Segoe UI", "Malgun Gothic",
+    "Apple SD Gothic Neo", sans-serif;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+}
