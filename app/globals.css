@@ -1,19 +1,31 @@
 @import "tailwindcss";
 
+/* Tossface — 토스가 실제 앱에서 쓰는 공개 이모지 폰트. 텍스트 글리프가 없어
+   Pretendard 다음 순서에 두면 이모지에만 적용된다. */
+@font-face {
+  font-family: "Tossface";
+  src: url("https://cdn.jsdelivr.net/gh/toss/tossface/dist/font/TossFaceFontMac.ttf")
+    format("truetype");
+  font-display: swap;
+}
+
+/* Toss 디자인 시스템(TDS) 실측 팔레트 */
 :root {
-  --brand: #0d3aa6;
-  --brand-deep: #0e1b30;
-  --ink: #1a2332;
-  --sub: #5b6676;
-  --line: #e5e9f0;
-  --bg: #f4f6f9;
+  --brand: #3182f6; /* Toss Blue 500 */
+  --brand-deep: #191f28; /* Grey 900 */
+  --ink: #191f28;
+  --sub: #8b95a1; /* Grey 500 */
+  --line: #e5e8eb; /* Grey 200 */
+  --bg: #f2f4f6; /* Grey 100 */
   --card: #ffffff;
-  --danger: #dc2626;
+  --danger: #f04452; /* Toss Red */
+  --brand-soft: #e8f3ff; /* Blue 50 */
 }
 
 @theme inline {
   --color-brand: var(--brand);
   --color-brand-deep: var(--brand-deep);
+  --color-brand-soft: var(--brand-soft);
   --color-ink: var(--ink);
   --color-sub: var(--sub);
   --color-line: var(--line);
@@ -23,11 +35,12 @@
 }
 
 html {
-  font-family: "Pretendard Variable", Pretendard, "Segoe UI", "Malgun Gothic",
-    "Apple SD Gothic Neo", sans-serif;
+  font-family: "Pretendard Variable", Pretendard, "Tossface", "Segoe UI",
+    "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
 }
 
 body {
   background: var(--bg);
   color: var(--ink);
+  letter-spacing: -0.01em;
 }
