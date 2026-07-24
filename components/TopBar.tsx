@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { BellIcon } from "@/components/icons";
 
 export default function TopBar() {
   return (
@@ -20,10 +21,10 @@ export default function TopBar() {
       <Link
         href="/menu"
         aria-label="알림"
-        className="relative flex h-10 w-10 items-center justify-center rounded-full text-xl active:bg-card"
+        className="relative flex h-10 w-10 items-center justify-center rounded-full text-ink2 active:bg-card"
       >
-        🔔
-        <span className="absolute right-1 top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-danger px-1 text-[9px] font-bold text-white">
+        <BellIcon className="h-[22px] w-[22px]" strokeWidth={1.8} />
+        <span className="absolute right-0.5 top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-danger px-1 text-[9px] font-bold text-white">
           3
         </span>
       </Link>
