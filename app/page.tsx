@@ -1,11 +1,27 @@
 import Link from "next/link";
 import { BUILDING, FEED } from "@/lib/mock";
+import {
+  AlertIcon,
+  CalendarCheckIcon,
+  ChevronIcon,
+  MessageIcon,
+  WrenchIcon,
+} from "@/components/icons";
 
-const KIND_STYLE: Record<string, { icon: string; tile: string }> = {
-  alarm: { icon: "🚨", tile: "bg-danger-soft" },
-  voc: { icon: "💬", tile: "bg-brand-soft" },
-  work: { icon: "🔧", tile: "bg-amber-50" },
-  inspection: { icon: "🗓️", tile: "bg-emerald-50" },
+const KIND_STYLE: Record<
+  string,
+  {
+    Icon: (p: { className?: string; strokeWidth?: number }) => React.ReactNode;
+    tile: string;
+  }
+> = {
+  alarm: { Icon: AlertIcon, tile: "bg-elev text-danger" },
+  voc: { Icon: MessageIcon, tile: "bg-brand-soft text-brand" },
+  work: { Icon: WrenchIcon, tile: "bg-tint-amber text-tint-amber-fg" },
+  inspection: {
+    Icon: CalendarCheckIcon,
+    tile: "bg-tint-emerald text-tint-emerald-fg",
+  },
 };
 
 function Sparkline({ data }: { data: readonly number[] }) {
@@ -59,21 +75,20 @@ export default function Home() {
       <div className="mt-3 space-y-3">
         {FEED.map((f, i) => {
           const s = KIND_STYLE[f.kind];
+          const urgent = f.kind === "alarm";
           return (
             <div
               key={f.id}
               className={`rise rounded-[20px] p-4 ${
-                f.kind === "alarm" ? "bg-danger-soft" : "bg-card"
+                urgent ? "bg-danger-soft" : "bg-card"
               }`}
               style={{ animationDelay: `${i * 70}ms` }}
             >
               <div className="flex items-start gap-3">
                 <span
-                  className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-xl ${
-                    f.kind === "alarm" ? "bg-white" : s.tile
-                  }`}
+                  className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${s.tile}`}
                 >
-                  {s.icon}
+                  <s.Icon className="h-5 w-5" strokeWidth={2.2} />
                 </span>
                 <div className="min-w-0 flex-1">
                   <div className="font-semibold leading-snug">{f.title}</div>
@@ -87,17 +102,21 @@ export default function Home() {
                   </div>
                 </div>
               </div>
+              {/* 위계: 긴급 1건만 강한 CTA, 나머지는 소프트 버튼 */}
               <div className="mt-3.5 flex items-center gap-2">
                 <Link
                   href={f.href}
-                  className={`flex-1 rounded-xl py-3 text-center text-sm font-bold text-white transition-transform active:scale-[0.98] ${
-                    f.kind === "alarm" ? "bg-danger" : "bg-brand"
+                  className={`flex flex-1 items-center justify-center gap-0.5 rounded-xl py-3 text-sm font-bold transition-transform active:scale-[0.98] ${
+                    urgent
+                      ? "bg-danger text-white"
+                      : "bg-brand-soft text-brand"
                   }`}
                 >
-                  {f.cta} <span className="opacity-70">›</span>
+                  {f.cta}
+                  <ChevronIcon className="h-4 w-4 opacity-60" strokeWidth={2.6} />
                 </Link>
-                {f.kind !== "alarm" && (
-                  <button className="rounded-xl bg-line px-4 py-3 text-sm font-semibold text-ink2 transition-transform active:scale-[0.98]">
+                {!urgent && (
+                  <button className="rounded-xl px-4 py-3 text-sm font-semibold text-sub transition-transform active:scale-[0.98]">
                     나중에
                   </button>
                 )}

@@ -12,7 +12,7 @@ const NEXT: Record<WoStatus, { label: string; to: WoStatus } | null> = {
 const BADGE: Record<WoStatus, string> = {
   대기: "bg-line text-ink2",
   진행중: "bg-brand-soft text-brand",
-  완료: "bg-emerald-50 text-emerald-600",
+  완료: "bg-tint-emerald text-tint-emerald-fg",
 };
 
 const FILTERS = ["전체", "대기", "진행중", "완료"] as const;
@@ -85,7 +85,7 @@ export default function WorkOrdersPage() {
             {NEXT[o.status] && (
               <button
                 onClick={() => advance(o.id)}
-                className="mt-3.5 w-full rounded-xl bg-brand py-3 text-sm font-bold text-white active:opacity-80"
+                className="mt-3.5 w-full rounded-xl bg-brand-soft py-3 text-sm font-bold text-brand transition-transform active:scale-[0.98]"
               >
                 {NEXT[o.status]!.label}
               </button>

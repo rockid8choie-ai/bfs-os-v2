@@ -11,7 +11,7 @@ export default function TopBar() {
           alt="BFS"
           width={64}
           height={20}
-          className="h-[18px] w-auto"
+          className="logo-knockout h-[18px] w-auto"
           priority
         />
         <span className="rounded-full bg-brand-soft px-2 py-0.5 text-[10px] font-bold tracking-wide text-brand">

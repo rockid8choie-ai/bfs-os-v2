@@ -21,12 +21,12 @@ const ICON_MAP: Record<
 > = {
   alert: { Icon: AlertIcon, tile: "bg-danger-soft text-danger" },
   bell: { Icon: BellIcon, tile: "bg-brand-soft text-brand" },
-  building: { Icon: BuildingIcon, tile: "bg-indigo-50 text-indigo-500" },
-  wrench: { Icon: WrenchIcon, tile: "bg-amber-50 text-amber-500" },
-  calendar: { Icon: CalendarCheckIcon, tile: "bg-emerald-50 text-emerald-500" },
-  shield: { Icon: ShieldCheckIcon, tile: "bg-purple-50 text-purple-500" },
+  building: { Icon: BuildingIcon, tile: "bg-tint-indigo text-tint-indigo-fg" },
+  wrench: { Icon: WrenchIcon, tile: "bg-tint-amber text-tint-amber-fg" },
+  calendar: { Icon: CalendarCheckIcon, tile: "bg-tint-emerald text-tint-emerald-fg" },
+  shield: { Icon: ShieldCheckIcon, tile: "bg-tint-purple text-tint-purple-fg" },
   chart: { Icon: ChartIcon, tile: "bg-brand-soft text-brand" },
-  file: { Icon: FileTextIcon, tile: "bg-teal-50 text-teal-600" },
+  file: { Icon: FileTextIcon, tile: "bg-tint-teal text-tint-teal-fg" },
 };
 
 export default function MenuPage() {
@@ -51,7 +51,7 @@ export default function MenuPage() {
                 <div
                   key={item.label}
                   className={`flex items-center gap-3 px-4 py-3.5 ${
-                    i > 0 ? "border-t border-white" : ""
+                    i > 0 ? "border-t border-page" : ""
                   } ${item.ready ? "" : "opacity-50"}`}
                 >
                   <span
@@ -66,7 +66,7 @@ export default function MenuPage() {
                   {item.ready ? (
                     <ChevronIcon className="h-4 w-4 text-mute" strokeWidth={2.4} />
                   ) : (
-                    <span className="shrink-0 rounded-full bg-white px-2.5 py-1 text-[10px] font-bold text-sub">
+                    <span className="shrink-0 rounded-full bg-elev px-2.5 py-1 text-[10px] font-bold text-sub">
                       데이터가 쌓이면 열려요
                     </span>
                   )}
@@ -95,7 +95,7 @@ export default function MenuPage() {
             </div>
             <ChevronIcon className="h-4 w-4 text-mute" strokeWidth={2.4} />
           </Link>
-          <div className="flex items-center gap-3 border-t border-white px-4 py-3.5">
+          <div className="flex items-center gap-3 border-t border-page px-4 py-3.5">
             <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-line text-ink2">
               <SlidersIcon className="h-5 w-5" strokeWidth={2} />
             </span>

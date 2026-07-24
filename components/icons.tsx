@@ -161,3 +161,38 @@ export function ChevronIcon({ className, strokeWidth = 2 }: IconProps) {
     </svg>
   );
 }
+
+export function PlusIcon({ className, strokeWidth = 2 }: IconProps) {
+  return (
+    <svg {...base} strokeWidth={strokeWidth} className={className}>
+      <path d="M5 12h14" />
+      <path d="M12 5v14" />
+    </svg>
+  );
+}
+
+export function CameraIcon({ className, strokeWidth = 2 }: IconProps) {
+  return (
+    <svg {...base} strokeWidth={strokeWidth} className={className}>
+      <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z" />
+      <circle cx="12" cy="13" r="3" />
+    </svg>
+  );
+}
+
+export function CheckIcon({ className, strokeWidth = 2 }: IconProps) {
+  return (
+    <svg {...base} strokeWidth={strokeWidth} className={className}>
+      <path d="M20 6 9 17l-5-5" />
+    </svg>
+  );
+}
+
+export function CheckCircleIcon({ className, strokeWidth = 2 }: IconProps) {
+  return (
+    <svg {...base} strokeWidth={strokeWidth} className={className}>
+      <path d="M21.801 10A10 10 0 1 1 17 3.335" />
+      <path d="m9 11 3 3L22 4" />
+    </svg>
+  );
+}

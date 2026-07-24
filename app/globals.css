@@ -1,14 +1,5 @@
 @import "tailwindcss";
 
-/* Tossface — 토스가 실제 앱에서 쓰는 공개 이모지 폰트. 텍스트 글리프가 없어
-   Pretendard 다음 순서에 두면 이모지에만 적용된다. */
-@font-face {
-  font-family: "Tossface";
-  src: url("https://cdn.jsdelivr.net/gh/toss/tossface/dist/font/TossFaceFontMac.ttf")
-    format("truetype");
-  font-display: swap;
-}
-
 /* 글로벌 모바일 UI 공통 문법(토스 TDS·Revolut·iOS HIG):
    흰 베이스 + 그레이 카드(무그림자), 강조는 색이 아니라 위계로 */
 :root {
@@ -20,10 +11,53 @@
   --sub: #8b95a1; /* Grey 500 */
   --mute: #b0b8c1; /* Grey 400 — 비활성 탭 */
   --line: #f2f4f6; /* Grey 100 — 헤어라인 */
-  --bg: #ffffff; /* 앱 베이스 = 흰색 */
+  --bg: #ffffff; /* 앱 베이스 */
   --card: #f7f8fa; /* 카드 = 라이트 그레이 (그림자 없음) */
+  --elev: #ffffff; /* 카드 위에 얹히는 표면 */
   --danger: #f04452; /* Toss Red */
   --danger-soft: #fdeeee;
+  --frame: #e9edf1; /* 데스크톱 폰 프레임 바깥 */
+  /* 카테고리 틴트 (배경 / 전경) */
+  --tint-amber: #fff6e0;
+  --tint-amber-fg: #d97706;
+  --tint-emerald: #e9f9f1;
+  --tint-emerald-fg: #059669;
+  --tint-indigo: #eef1ff;
+  --tint-indigo-fg: #6366f1;
+  --tint-purple: #f7f0ff;
+  --tint-purple-fg: #9333ea;
+  --tint-teal: #e8faf7;
+  --tint-teal-fg: #0d9488;
+}
+
+/* 다크모드 — 시스템 설정 자동 감지 (TDS 다크 그레이 스케일) */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --brand: #3182f6;
+    --brand-deep: #e9edf2;
+    --brand-soft: rgba(49, 130, 246, 0.16);
+    --ink: #e9edf2;
+    --ink-2: #c3cad4;
+    --sub: #8b95a1;
+    --mute: #566171;
+    --line: #232a34;
+    --bg: #111418;
+    --card: #1b222c;
+    --elev: #242c37;
+    --danger: #f04452;
+    --danger-soft: rgba(240, 68, 82, 0.16);
+    --frame: #0a0c0f;
+    --tint-amber: rgba(245, 158, 11, 0.15);
+    --tint-amber-fg: #fbbf24;
+    --tint-emerald: rgba(16, 185, 129, 0.15);
+    --tint-emerald-fg: #34d399;
+    --tint-indigo: rgba(99, 102, 241, 0.16);
+    --tint-indigo-fg: #818cf8;
+    --tint-purple: rgba(168, 85, 247, 0.15);
+    --tint-purple-fg: #c084fc;
+    --tint-teal: rgba(20, 184, 166, 0.15);
+    --tint-teal-fg: #2dd4bf;
+  }
 }
 
 @theme inline {
@@ -37,13 +71,24 @@
   --color-line: var(--line);
   --color-page: var(--bg);
   --color-card: var(--card);
+  --color-elev: var(--elev);
   --color-danger: var(--danger);
   --color-danger-soft: var(--danger-soft);
+  --color-tint-amber: var(--tint-amber);
+  --color-tint-amber-fg: var(--tint-amber-fg);
+  --color-tint-emerald: var(--tint-emerald);
+  --color-tint-emerald-fg: var(--tint-emerald-fg);
+  --color-tint-indigo: var(--tint-indigo);
+  --color-tint-indigo-fg: var(--tint-indigo-fg);
+  --color-tint-purple: var(--tint-purple);
+  --color-tint-purple-fg: var(--tint-purple-fg);
+  --color-tint-teal: var(--tint-teal);
+  --color-tint-teal-fg: var(--tint-teal-fg);
 }
 
 html {
-  font-family: "Pretendard Variable", Pretendard, "Tossface", "Segoe UI",
-    "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+  font-family: "Wanted Sans Variable", "Wanted Sans", "Pretendard Variable",
+    Pretendard, "Segoe UI", "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
 }
 
 body {
@@ -51,6 +96,20 @@ body {
   color: var(--ink);
   letter-spacing: -0.01em;
   font-variant-numeric: tabular-nums;
+}
+
+/* 데스크톱에서는 폰 프레임이 뜨도록 바깥 배경만 구분 */
+@media (min-width: 768px) {
+  body {
+    background: var(--frame);
+  }
+}
+
+/* 다크모드에서 로고는 승인된 방식(v1과 동일)인 흰색 녹아웃으로만 표시 */
+@media (prefers-color-scheme: dark) {
+  .logo-knockout {
+    filter: brightness(0) invert(1);
+  }
 }
 
 /* 카드 스태거 등장 모션 */
@@ -68,15 +127,58 @@ body {
   animation: rise 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
+/* 페이지 전환 모션 (라우트 이동마다 template 재마운트) */
+@keyframes pageIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.page-enter {
+  animation: pageIn 0.28s ease-out both;
+}
+
+/* 바텀시트 등장 */
+@keyframes sheetUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.sheet-up {
+  animation: sheetUp 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* 당겨서 새로고침 스피너 */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.ptr-spin {
+  animation: spin 0.8s linear infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .rise {
+  .rise,
+  .page-enter,
+  .sheet-up {
     animation: none;
   }
 }
 
-/* 데스크톱에서는 폰 프레임이 뜨도록 바깥 배경만 그레이 */
-@media (min-width: 768px) {
-  body {
-    background: #e9edf1;
-  }
+/* 데스크톱 폰 프레임 내부 스크롤 — 스크롤바 숨김 */
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
 }

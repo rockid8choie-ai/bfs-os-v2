@@ -1,4 +1,5 @@
 import { PLANS } from "@/lib/mock";
+import { CheckIcon } from "@/components/icons";
 
 export default function PricingPage() {
   return (
@@ -37,8 +38,11 @@ export default function PricingPage() {
             </div>
             <ul className="mt-3.5 space-y-2 text-sm">
               {p.features.map((f) => (
-                <li key={f} className="flex gap-2">
-                  <span className="font-bold text-brand">✓</span>
+                <li key={f} className="flex items-center gap-2">
+                  <CheckIcon
+                    className="h-4 w-4 shrink-0 text-brand"
+                    strokeWidth={3}
+                  />
                   <span>{f}</span>
                 </li>
               ))}
@@ -47,7 +51,7 @@ export default function PricingPage() {
               className={`mt-4 w-full rounded-xl py-3 text-sm font-bold active:opacity-80 ${
                 p.highlight
                   ? "bg-brand text-white"
-                  : "bg-white text-ink2"
+                  : "bg-elev text-ink2"
               }`}
             >
               {p.cta}
