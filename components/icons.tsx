@@ -188,6 +188,62 @@ export function CheckIcon({ className, strokeWidth = 2 }: IconProps) {
   );
 }
 
+export function UserIcon({ className, strokeWidth = 2 }: IconProps) {
+  return (
+    <svg {...base} strokeWidth={strokeWidth} className={className}>
+      <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+      <circle cx="12" cy="7" r="4" />
+    </svg>
+  );
+}
+
+export function UsersIcon({ className, strokeWidth = 2 }: IconProps) {
+  return (
+    <svg {...base} strokeWidth={strokeWidth} className={className}>
+      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+      <circle cx="9" cy="7" r="4" />
+      <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+    </svg>
+  );
+}
+
+export function PhoneIcon({ className, strokeWidth = 2 }: IconProps) {
+  return (
+    <svg {...base} strokeWidth={strokeWidth} className={className}>
+      <path d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384" />
+    </svg>
+  );
+}
+
+export function ClockIcon({ className, strokeWidth = 2 }: IconProps) {
+  return (
+    <svg {...base} strokeWidth={strokeWidth} className={className}>
+      <circle cx="12" cy="12" r="10" />
+      <polyline points="12 6 12 12 16 14" />
+    </svg>
+  );
+}
+
+export function SwapIcon({ className, strokeWidth = 2 }: IconProps) {
+  return (
+    <svg {...base} strokeWidth={strokeWidth} className={className}>
+      <path d="m17 2 4 4-4 4" />
+      <path d="M3 11v-1a4 4 0 0 1 4-4h14" />
+      <path d="m7 22-4-4 4-4" />
+      <path d="M21 13v1a4 4 0 0 1-4 4H3" />
+    </svg>
+  );
+}
+
+export function SparkIcon({ className, strokeWidth = 2 }: IconProps) {
+  return (
+    <svg {...base} strokeWidth={strokeWidth} className={className}>
+      <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z" />
+    </svg>
+  );
+}
+
 export function CheckCircleIcon({ className, strokeWidth = 2 }: IconProps) {
   return (
     <svg {...base} strokeWidth={strokeWidth} className={className}>

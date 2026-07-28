@@ -1,4 +1,6 @@
 import Link from "next/link";
+import RoleSwitch from "@/components/RoleSwitch";
+import TeamList from "@/components/TeamList";
 import { MENU_GROUPS } from "@/lib/mock";
 import {
   AlertIcon,
@@ -77,31 +79,50 @@ export default function MenuPage() {
         </section>
       ))}
 
-      <section className="rise mt-7" style={{ animationDelay: "240ms" }}>
+      <TeamList />
+      <RoleSwitch />
+
+      <section className="rise mt-7" style={{ animationDelay: "340ms" }}>
         <h2 className="px-1 text-[13px] font-bold text-sub">설정</h2>
         <div className="mt-2.5 overflow-hidden rounded-[20px] bg-card">
           <Link
-            href="/pricing"
+            href="/landing"
             className="flex items-center gap-3 px-4 py-3.5 active:bg-line"
+          >
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-tint-indigo text-tint-indigo-fg">
+              <BuildingIcon className="h-5 w-5" strokeWidth={2} />
+            </span>
+            <div className="min-w-0 flex-1">
+              <div className="text-[15px] font-semibold">서비스 소개</div>
+              <div className="mt-0.5 text-xs text-sub">
+                BFS OS가 무엇을 하는지 한 장으로
+              </div>
+            </div>
+            <ChevronIcon className="h-4 w-4 text-mute" strokeWidth={2.4} />
+          </Link>
+          <Link
+            href="/pricing"
+            className="flex items-center gap-3 border-t border-page px-4 py-3.5 active:bg-line"
           >
             <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-soft text-brand">
               <CardIcon className="h-5 w-5" strokeWidth={2} />
             </span>
             <div className="min-w-0 flex-1">
-              <div className="text-[15px] font-semibold">요금제</div>
+              <div className="text-[15px] font-semibold">이용 안내</div>
               <div className="mt-0.5 text-xs text-sub">
-                공개 요금표 — 상담 없이 오늘 시작
+                지금은 무료 체험 기간이에요
               </div>
             </div>
             <ChevronIcon className="h-4 w-4 text-mute" strokeWidth={2.4} />
           </Link>
-          <div className="flex items-center gap-3 border-t border-page px-4 py-3.5">
+          <div className="flex items-center gap-3 border-t border-page px-4 py-3.5 opacity-50">
             <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-line text-ink2">
               <SlidersIcon className="h-5 w-5" strokeWidth={2} />
             </span>
-            <div className="text-[15px] font-semibold">
-              프로필 · 구성원 · 빌딩 설정
-            </div>
+            <div className="min-w-0 flex-1 text-[15px] font-semibold">빌딩 설정</div>
+            <span className="shrink-0 rounded-full bg-elev px-2.5 py-1 text-[10px] font-bold text-sub">
+              준비 중
+            </span>
           </div>
         </div>
       </section>
