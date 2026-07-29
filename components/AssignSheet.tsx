@@ -36,11 +36,11 @@ export default function AssignSheet() {
 
   return (
     <div
-      className="fixed inset-0 z-40 flex items-end justify-center overflow-hidden bg-black/50 md:absolute md:rounded-[38px]"
+      className="fixed inset-0 z-40 flex items-end justify-center overflow-hidden bg-black/50 md:items-center md:p-6"
       onClick={closeAssign}
     >
       <div
-        className="sheet-up max-h-[88%] w-full max-w-md overflow-y-auto rounded-t-3xl bg-page p-5 pb-8"
+        className="sheet-up max-h-[88%] w-full max-w-md overflow-y-auto rounded-t-3xl bg-page p-5 pb-8 md:max-h-[85vh] md:rounded-3xl md:pb-5 md:shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         <h2 className="text-lg font-bold">

@@ -45,11 +45,11 @@ export default function MemberSheet() {
 
   return (
     <div
-      className="fixed inset-0 z-40 flex items-end justify-center overflow-hidden bg-black/50 md:absolute md:rounded-[38px]"
+      className="fixed inset-0 z-40 flex items-end justify-center overflow-hidden bg-black/50 md:items-center md:p-6"
       onClick={closeMember}
     >
       <div
-        className="sheet-up max-h-[88%] w-full max-w-md overflow-y-auto rounded-t-3xl bg-page p-5 pb-8"
+        className="sheet-up max-h-[88%] w-full max-w-md overflow-y-auto rounded-t-3xl bg-page p-5 pb-8 md:max-h-[85vh] md:rounded-3xl md:pb-5 md:shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center gap-3.5">

@@ -153,9 +153,9 @@ export default function Home() {
         <span className="text-xs font-semibold text-sub">중요한 순서로 정렬됨</span>
       </div>
 
-      <div className="mt-3 space-y-3">
+      <div className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-2">
         {feed.length === 0 && (
-          <div className="rounded-[20px] bg-card px-4 py-8 text-center text-sm text-sub">
+          <div className="rounded-[20px] bg-card px-4 py-8 text-center text-sm text-sub md:col-span-2">
             지금 처리할 일이 없어요
           </div>
         )}
@@ -166,7 +166,7 @@ export default function Home() {
           return (
             <div
               key={f.id}
-              className={`rise rounded-[20px] p-4 ${f.urgent ? "bg-danger-soft" : "bg-card"}`}
+              className={`rise flex flex-col rounded-[20px] p-4 ${f.urgent ? "bg-danger-soft" : "bg-card"}`}
               style={{ animationDelay: `${i * 70}ms` }}
             >
               <div className="flex items-start gap-3">
@@ -190,7 +190,7 @@ export default function Home() {
                 )}
               </div>
 
-              <div className="mt-3.5">
+              <div className="mt-auto pt-3.5">
                 {f.href ? (
                   <Link
                     href={f.href}

@@ -51,9 +51,9 @@ export default function WorkOrdersPage() {
         ))}
       </div>
 
-      <div className="mt-4 space-y-3">
+      <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2">
         {shown.length === 0 && (
-          <div className="rounded-[20px] bg-card px-4 py-10 text-center text-sm text-sub">
+          <div className="rounded-[20px] bg-card px-4 py-10 text-center text-sm text-sub md:col-span-2">
             해당하는 작업이 없어요
           </div>
         )}

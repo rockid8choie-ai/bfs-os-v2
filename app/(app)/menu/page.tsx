@@ -33,7 +33,7 @@ const ICON_MAP: Record<
 
 export default function MenuPage() {
   return (
-    <div>
+    <div className="md:max-w-2xl">
       <div className="mt-3 flex items-center gap-2.5 rounded-2xl bg-card px-4 py-3.5 text-sm text-sub">
         <SearchIcon className="h-[18px] w-[18px]" strokeWidth={2.2} />
         <span>민원, 작업, 설비 통합 검색</span>

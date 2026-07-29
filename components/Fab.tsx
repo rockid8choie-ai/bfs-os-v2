@@ -21,9 +21,19 @@ const KIND_STYLE = {
 } as const;
 
 export default function Fab() {
-  const { members, orders, createOrder, assign, openAssign, me, role } = useApp();
+  const {
+    members,
+    orders,
+    createOrder,
+    assign,
+    openAssign,
+    me,
+    role,
+    intakeOpen,
+    openIntake,
+    closeIntake,
+  } = useApp();
 
-  const [open, setOpen] = useState(false);
   const [text, setText] = useState("");
   const [route, setRoute] = useState<Classified | null>(null);
   const [result, setResult] = useState<{ orderId: string; assigneeId: string } | null>(
@@ -31,7 +41,7 @@ export default function Fab() {
   );
 
   const reset = () => {
-    setOpen(false);
+    closeIntake();
     setText("");
     setRoute(null);
     setResult(null);
@@ -60,23 +70,24 @@ export default function Fab() {
 
   return (
     <>
-      <div className="pointer-events-none fixed inset-x-0 bottom-20 z-30 mx-auto flex w-full max-w-md justify-end px-4 md:absolute">
+      {/* 모바일 전용 FAB — 데스크톱은 사이드바의 접수하기 버튼이 담당 */}
+      <div className="pointer-events-none fixed inset-x-0 bottom-20 z-30 mx-auto flex w-full max-w-md justify-end px-4 md:hidden">
         <button
           aria-label="접수하기"
-          onClick={() => setOpen(true)}
+          onClick={openIntake}
           className="pointer-events-auto flex h-14 w-14 items-center justify-center rounded-full bg-brand text-white shadow-[0_8px_20px_rgba(49,130,246,0.4)] transition-transform active:scale-95"
         >
           <PlusIcon className="h-7 w-7" strokeWidth={2.4} />
         </button>
       </div>
 
-      {open && (
+      {intakeOpen && (
         <div
-          className="fixed inset-0 z-40 flex items-end justify-center overflow-hidden bg-black/50 md:absolute md:rounded-[38px]"
+          className="fixed inset-0 z-40 flex items-end justify-center overflow-hidden bg-black/50 md:items-center md:p-6"
           onClick={reset}
         >
           <div
-            className="sheet-up max-h-[88%] w-full max-w-md overflow-y-auto rounded-t-3xl bg-page p-5 pb-8"
+            className="sheet-up max-h-[88%] w-full max-w-md overflow-y-auto rounded-t-3xl bg-page p-5 pb-8 md:max-h-[85vh] md:rounded-3xl md:pb-5 md:shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             {!result ? (

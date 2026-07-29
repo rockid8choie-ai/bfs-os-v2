@@ -70,6 +70,10 @@ interface AppState {
   openAssign: (orderId: string) => void;
   closeAssign: () => void;
 
+  intakeOpen: boolean;
+  openIntake: () => void;
+  closeIntake: () => void;
+
   memberTarget: { memberId: string; fromOrderId?: string } | null;
   openMember: (memberId: string, fromOrderId?: string) => void;
   closeMember: () => void;
@@ -94,6 +98,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [vocs, setVocs] = useState<Voc[]>(VOCS);
   const [filter, setFilter] = useState<Filter>("전체");
   const [assignTarget, setAssignTarget] = useState<string | null>(null);
+  const [intakeOpen, setIntakeOpen] = useState(false);
   const [memberTarget, setMemberTarget] = useState<{
     memberId: string;
     fromOrderId?: string;
@@ -276,6 +281,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
     assignTarget,
     openAssign: setAssignTarget,
     closeAssign: () => setAssignTarget(null),
+    intakeOpen,
+    openIntake: () => setIntakeOpen(true),
+    closeIntake: () => setIntakeOpen(false),
     memberTarget,
     openMember: (memberId, fromOrderId) => setMemberTarget({ memberId, fromOrderId }),
     closeMember: () => setMemberTarget(null),

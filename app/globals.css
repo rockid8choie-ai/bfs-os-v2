@@ -16,7 +16,6 @@
   --elev: #ffffff; /* 카드 위에 얹히는 표면 */
   --danger: #f04452; /* Toss Red */
   --danger-soft: #fdeeee;
-  --frame: #e9edf1; /* 데스크톱 폰 프레임 바깥 */
   /* 카테고리 틴트 (배경 / 전경) */
   --tint-amber: #fff6e0;
   --tint-amber-fg: #d97706;
@@ -46,7 +45,6 @@
     --elev: #242c37;
     --danger: #f04452;
     --danger-soft: rgba(240, 68, 82, 0.16);
-    --frame: #0a0c0f;
     --tint-amber: rgba(245, 158, 11, 0.15);
     --tint-amber-fg: #fbbf24;
     --tint-emerald: rgba(16, 185, 129, 0.15);
@@ -96,13 +94,6 @@ body {
   color: var(--ink);
   letter-spacing: -0.01em;
   font-variant-numeric: tabular-nums;
-}
-
-/* 데스크톱에서는 폰 프레임이 뜨도록 바깥 배경만 구분 */
-@media (min-width: 768px) {
-  body {
-    background: var(--frame);
-  }
 }
 
 /* 다크모드에서 로고는 승인된 방식(v1과 동일)인 흰색 녹아웃으로만 표시 */
@@ -175,7 +166,7 @@ body {
   }
 }
 
-/* 데스크톱 폰 프레임 내부 스크롤 — 스크롤바 숨김 */
+/* 가로 스크롤 영역(필터 칩 등) — 스크롤바 숨김 */
 .no-scrollbar {
   scrollbar-width: none;
 }

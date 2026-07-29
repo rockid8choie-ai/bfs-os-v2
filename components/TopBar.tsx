@@ -4,7 +4,7 @@ import { BellIcon } from "@/components/icons";
 
 export default function TopBar() {
   return (
-    <header className="sticky top-0 z-20 flex items-center justify-between bg-page/85 px-5 py-3 backdrop-blur-md">
+    <header className="sticky top-0 z-20 flex items-center justify-between bg-page/85 px-5 py-3 backdrop-blur-md md:hidden">
       <Link href="/" className="flex items-center gap-2">
         <Image
           src="/bfs-wordmark.png"

@@ -28,7 +28,7 @@ export default function VocPage() {
         유형을 미리 분류해뒀어요
       </p>
 
-      <div className="mt-5 space-y-3">
+      <div className="mt-5 grid grid-cols-1 gap-3 md:grid-cols-2">
         {vocs.map((v, i) => {
           const linked = orders.find((o) => o.vocId === v.id);
           const assignee = memberById(linked?.assigneeId);

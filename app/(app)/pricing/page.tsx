@@ -4,7 +4,7 @@ import { CheckIcon, SparkIcon } from "@/components/icons";
 
 export default function PricingPage() {
   return (
-    <div>
+    <div className="md:max-w-2xl">
       <h1 className="mt-3 text-[24px] font-extrabold tracking-[-0.02em]">이용 안내</h1>
       <p className="mt-1 text-sm leading-relaxed text-sub">
         지금은 <b className="text-ink">무료 체험</b> 기간입니다.

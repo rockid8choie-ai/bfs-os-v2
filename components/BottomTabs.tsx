@@ -17,7 +17,7 @@ export default function BottomTabs() {
     href === "/" ? pathname === "/" : pathname.startsWith(href);
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-20 mx-auto flex w-full max-w-md border-t border-line bg-page/90 pb-[env(safe-area-inset-bottom)] backdrop-blur-md md:absolute md:rounded-b-[38px] md:pb-2">
+    <nav className="fixed inset-x-0 bottom-0 z-20 mx-auto flex w-full max-w-md border-t border-line bg-page/90 pb-[env(safe-area-inset-bottom)] backdrop-blur-md md:hidden">
       {TABS.map(({ href, label, Icon }) => {
         const active = isActive(href);
         return (
