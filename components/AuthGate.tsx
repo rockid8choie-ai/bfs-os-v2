@@ -2,6 +2,7 @@
 
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
+import ScreenLoader from "@/components/ScreenLoader";
 import { useApp } from "@/lib/store";
 
 const PUBLIC_APP_PATHS = new Set(["/pricing"]);
@@ -18,22 +19,7 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
   }, [authenticated, pathname, publicPage, ready, router]);
 
   if (publicPage) return children;
-
-  if (!ready) {
-    return (
-      <div className="flex min-h-[40vh] items-center justify-center text-sm font-semibold text-sub">
-        불러오는 중…
-      </div>
-    );
-  }
-
-  if (!authenticated) {
-    return (
-      <div className="flex min-h-[40vh] items-center justify-center text-sm font-semibold text-sub">
-        로그인 페이지로 이동합니다…
-      </div>
-    );
-  }
-
+  if (!ready) return <ScreenLoader label="작업 불러오는 중" />;
+  if (!authenticated) return <ScreenLoader label="로그인 페이지로 이동" />;
   return children;
 }

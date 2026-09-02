@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import {
   AlertIcon,
@@ -12,6 +11,7 @@ import {
   UsersIcon,
   WrenchIcon,
 } from "@/components/icons";
+import Logo from "@/components/Logo";
 
 export const metadata: Metadata = {
   title: "BFS OS — 빌딩 시설 운영, 폰 하나로",
@@ -87,22 +87,12 @@ export default function LandingPage() {
       {/* 로고는 밝은 배경 위에만 — 진남색 워드마크가 묻히지 않도록 내비는 흰 배경 유지 */}
       <header className="sticky top-0 z-30 border-b border-line bg-page/90 backdrop-blur-md">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3.5">
-          <div className="flex items-center gap-2">
-            <Image
-              src="/bfs-wordmark.png"
-              alt="BFS"
-              width={72}
-              height={22}
-              className="logo-knockout h-[20px] w-auto"
-              priority
-            />
-            <span className="rounded-full bg-brand-soft px-2 py-0.5 text-[10px] font-bold tracking-wide text-brand">
-              OS
-            </span>
-          </div>
+          <Link href="/" className="flex items-center">
+            <Logo />
+          </Link>
           <Link
-            href="/"
-            className="rounded-xl bg-brand px-4 py-2.5 text-[13px] font-bold text-white transition-transform active:scale-95"
+            href="/login"
+            className="min-h-[44px] rounded-xl bg-brand px-4 py-2.5 text-[13px] font-bold text-white transition-transform active:scale-95"
           >
             무료로 체험하기
           </Link>
@@ -128,9 +118,9 @@ export default function LandingPage() {
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <Link
-                href="/"
-                className="flex items-center gap-1 rounded-2xl bg-white px-6 py-3.5 text-[15px] font-bold text-[#191f28] transition-transform active:scale-95"
-              >
+            href="/login"
+            className="flex min-h-[48px] items-center gap-1 rounded-2xl bg-white px-6 py-3.5 text-[15px] font-bold text-[#191f28] transition-transform active:scale-95"
+          >
                 무료로 체험하기
                 <ChevronIcon className="h-4 w-4 opacity-50" strokeWidth={2.6} />
               </Link>
@@ -358,8 +348,8 @@ export default function LandingPage() {
             체험 중 쌓인 데이터와 이력은 그대로 유지됩니다.
           </p>
           <Link
-            href="/"
-            className="mt-8 inline-flex items-center gap-1 rounded-2xl bg-white px-8 py-4 text-[15px] font-bold text-[#191f28] transition-transform active:scale-95"
+            href="/login"
+            className="mt-8 inline-flex min-h-[48px] items-center gap-1 rounded-2xl bg-white px-8 py-4 text-[15px] font-bold text-[#191f28] transition-transform active:scale-95"
           >
             무료로 체험하기
             <ChevronIcon className="h-4 w-4 opacity-50" strokeWidth={2.6} />
@@ -373,17 +363,11 @@ export default function LandingPage() {
       <footer className="border-t border-line">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-5 py-8">
           <div className="flex items-center gap-2">
-            <Image
-              src="/bfs-wordmark.png"
-              alt="BFS"
-              width={64}
-              height={20}
-              className="logo-knockout h-[18px] w-auto"
-            />
+            <Logo compact />
             <span className="text-[12px] text-sub">Building Facility Service</span>
           </div>
           <div className="flex items-center gap-5 text-[12.5px] font-semibold text-sub">
-            <Link href="/">앱 체험</Link>
+            <Link href="/login">앱 체험</Link>
             <Link href="/pricing">이용 안내</Link>
           </div>
         </div>

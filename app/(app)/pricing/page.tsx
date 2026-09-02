@@ -34,8 +34,8 @@ export default function PricingPage() {
         </ul>
 
         <Link
-          href="/"
-          className="mt-4 block w-full rounded-xl bg-brand py-3 text-center text-sm font-bold text-white active:opacity-80"
+          href="/login"
+          className="mt-4 block w-full rounded-xl bg-brand py-3.5 text-center text-sm font-bold text-white active:opacity-80"
         >
           무료로 시작하기
         </Link>

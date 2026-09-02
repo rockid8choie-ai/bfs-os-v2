@@ -81,7 +81,7 @@ export default function Fab() {
   return (
     <>
       {/* 모바일 전용 FAB — 데스크톱은 사이드바의 접수하기 버튼이 담당 */}
-      <div className="pointer-events-none fixed inset-x-0 bottom-20 z-30 mx-auto flex w-full max-w-md justify-end px-4 md:hidden">
+      <div className="pointer-events-none fixed inset-x-0 bottom-[calc(5.25rem+env(safe-area-inset-bottom))] z-30 mx-auto flex w-full max-w-md justify-end px-4 md:hidden">
         <button
           aria-label="접수하기"
           onClick={openIntake}
@@ -118,7 +118,7 @@ export default function Fab() {
                   }}
                   placeholder="예) 3층 화장실 온수가 안 나와요"
                   rows={2}
-                  className="mt-3 w-full rounded-xl border border-line bg-page p-3 text-[15px] outline-none focus:border-brand"
+                  className="mt-3 w-full rounded-xl border border-line bg-page p-3 text-[16px] outline-none focus:border-brand"
                 />
 
                 {route && (

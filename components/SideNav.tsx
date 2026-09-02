@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -11,6 +10,7 @@ import {
   PlusIcon,
   WrenchIcon,
 } from "@/components/icons";
+import Logo from "@/components/Logo";
 import { todayLabel } from "@/lib/dates";
 import { useApp } from "@/lib/store";
 
@@ -24,24 +24,15 @@ const NAV = [
 /** 데스크톱(md+) 전용 좌측 내비게이션 — 모바일은 BottomTabs가 담당 */
 export default function SideNav() {
   const pathname = usePathname();
-  const { openIntake, buildingName } = useApp();
+  const { openIntake, buildingName, vocs } = useApp();
+  const unread = vocs.filter((v) => v.status === "접수").length;
   const isActive = (href: string) =>
     href === "/" ? pathname === "/" : pathname.startsWith(href);
 
   return (
     <aside className="sticky top-0 hidden h-dvh w-60 shrink-0 flex-col border-r border-line bg-page px-4 py-6 md:flex">
-      <Link href="/" className="flex items-center gap-2 px-2">
-        <Image
-          src="/bfs-wordmark.png"
-          alt="BFS"
-          width={64}
-          height={20}
-          className="logo-knockout h-[18px] w-auto"
-          priority
-        />
-        <span className="rounded-full bg-brand-soft px-2 py-0.5 text-[10px] font-bold tracking-wide text-brand">
-          OS
-        </span>
+      <Link href="/" className="flex items-center px-2">
+        <Logo compact />
       </Link>
 
       <button
@@ -71,14 +62,16 @@ export default function SideNav() {
           );
         })}
         <Link
-          href="/menu"
+          href="/voc"
           className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-[14px] font-medium text-sub transition-colors hover:bg-card/60 hover:text-ink2"
         >
           <span className="relative">
             <BellIcon className="h-5 w-5" strokeWidth={1.8} />
-            <span className="absolute -right-1 -top-1 flex h-3.5 min-w-3.5 items-center justify-center rounded-full bg-danger px-0.5 text-[8px] font-bold text-white">
-              3
-            </span>
+            {unread > 0 && (
+              <span className="absolute -right-1 -top-1 flex h-3.5 min-w-3.5 items-center justify-center rounded-full bg-danger px-0.5 text-[8px] font-bold text-white">
+                {unread > 9 ? "9+" : unread}
+              </span>
+            )}
           </span>
           알림
         </Link>
