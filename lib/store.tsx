@@ -1,33 +1,17 @@
 "use client";
 
-// BFS OS v2.1 — 앱 전역 상태
-// v2에서는 페이지마다 목업을 각자 useState로 복사해 써서 화면 간 흐름이 끊겼다.
-// (접수해도 목록에 안 쌓이고, 민원을 전환해도 작업이 생기지 않음)
-// 배정은 "여러 화면이 같은 데이터를 본다"는 전제가 있어야 성립하므로 스토어로 통일한다.
-// v3에서 Supabase 쿼리로 교체할 때 이 인터페이스가 그대로 경계가 된다.
-
 import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
   type ReactNode,
 } from "react";
-import {
-  BUILDING,
-  MEMBERS,
-  VOCS,
-  WORK_ORDERS,
-  type Member,
-  type Priority,
-  type Role,
-  type Specialty,
-  type Voc,
-  type WorkOrder,
-  type WoStatus,
-} from "./mock";
-import { loadOf as calcLoad, recommend, type Recommendation } from "./assign";
+import { api, ApiClientError } from "./api";
+import { recommend, type Recommendation } from "./assign";
+import { BUILDING, type Member, type Priority, type Role, type Specialty, type Voc, type WoStatus, type WorkOrder } from "./mock";
 
 export type Filter = "전체" | WoStatus;
 
@@ -39,12 +23,21 @@ interface NewOrderInput {
   source: string;
   due?: string;
   vocId?: string;
+  assigneeId?: string;
+  autoAssign?: boolean;
 }
 
+type PublicUser = Member & { email?: string; buildingName?: string };
+
 interface AppState {
+  ready: boolean;
+  authenticated: boolean;
+  loading: boolean;
+  error: string | null;
+  clearError: () => void;
+
   role: Role;
-  setRole: (r: Role) => void;
-  me: Member;
+  me: PublicUser | null;
   members: Member[];
   techs: Member[];
   memberById: (id?: string) => Member | undefined;
@@ -58,10 +51,14 @@ interface AppState {
   ordersOf: (memberId: string) => WorkOrder[];
   recommendFor: (o: WorkOrder) => Recommendation | null;
 
-  assign: (orderId: string, memberId: string) => void;
-  advance: (orderId: string) => void;
-  createOrder: (input: NewOrderInput) => string;
-  convertVoc: (vocId: string) => string;
+  login: (email: string, password: string) => Promise<void>;
+  logout: () => Promise<void>;
+  refresh: () => Promise<void>;
+
+  assign: (orderId: string, memberId: string) => Promise<void>;
+  advance: (orderId: string) => Promise<void>;
+  createOrder: (input: NewOrderInput) => Promise<WorkOrder>;
+  convertVoc: (vocId: string) => Promise<string>;
 
   filter: Filter;
   setFilter: (f: Filter) => void;
@@ -81,21 +78,25 @@ interface AppState {
   autoAssigned: number;
   savedHours: number;
   counts: Record<Exclude<Filter, "전체">, number>;
+  buildingName: string;
 }
 
 const Ctx = createContext<AppState | null>(null);
 
-function stamp() {
-  const d = new Date();
-  const hh = String(d.getHours()).padStart(2, "0");
-  const mm = String(d.getMinutes()).padStart(2, "0");
-  return `오늘 ${hh}:${mm}`;
+function messageOf(error: unknown) {
+  if (error instanceof ApiClientError) return error.message;
+  if (error instanceof Error) return error.message;
+  return "요청에 실패했습니다.";
 }
 
 export function AppProvider({ children }: { children: ReactNode }) {
-  const [role, setRole] = useState<Role>("manager");
-  const [orders, setOrders] = useState<WorkOrder[]>(WORK_ORDERS);
-  const [vocs, setVocs] = useState<Voc[]>(VOCS);
+  const [ready, setReady] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [me, setMe] = useState<PublicUser | null>(null);
+  const [members, setMembers] = useState<Member[]>([]);
+  const [orders, setOrders] = useState<WorkOrder[]>([]);
+  const [vocs, setVocs] = useState<Voc[]>([]);
   const [filter, setFilter] = useState<Filter>("전체");
   const [assignTarget, setAssignTarget] = useState<string | null>(null);
   const [intakeOpen, setIntakeOpen] = useState(false);
@@ -103,13 +104,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
     memberId: string;
     fromOrderId?: string;
   } | null>(null);
-  const [seq, setSeq] = useState(100);
 
-  const members = MEMBERS;
+  const role: Role = me?.role ?? "manager";
   const techs = useMemo(() => members.filter((m) => m.role === "tech"), [members]);
-  const manager = members.find((m) => m.role === "manager")!;
-  // 베타 시연용 팀원 계정 — 인증 도입 시 로그인 사용자로 대체
-  const me = role === "manager" ? manager : techs[0];
 
   const memberById = useCallback(
     (id?: string) => (id ? members.find((m) => m.id === id) : undefined),
@@ -117,14 +114,16 @@ export function AppProvider({ children }: { children: ReactNode }) {
   );
 
   const loadOf = useCallback(
-    (memberId: string) => calcLoad(orders, memberId),
+    (memberId: string) =>
+      orders.filter(
+        (o) => o.assigneeId === memberId && (o.status === "배정됨" || o.status === "진행중")
+      ).length,
     [orders]
   );
 
   const doneTodayOf = useCallback(
     (memberId: string) =>
-      orders.filter((o) => o.assigneeId === memberId && o.status === "완료")
-        .length,
+      orders.filter((o) => o.assigneeId === memberId && o.status === "완료").length,
     [orders]
   );
 
@@ -138,104 +137,136 @@ export function AppProvider({ children }: { children: ReactNode }) {
     [members, orders]
   );
 
-  const assign = useCallback(
-    (orderId: string, memberId: string) => {
-      setOrders((prev) =>
-        prev.map((o) =>
-          o.id === orderId
-            ? {
-                ...o,
-                assigneeId: memberId,
-                assignedBy: role === "manager" ? manager.id : memberId,
-                assignedAt: stamp(),
-                // 완료된 작업의 재배정은 상태를 되돌리지 않는다
-                status: o.status === "완료" ? o.status : ("배정됨" as WoStatus),
-              }
-            : o
-        )
-      );
-    },
-    [manager.id, role]
-  );
-
-  const advance = useCallback((orderId: string) => {
-    setOrders((prev) =>
-      prev.map((o) => {
-        if (o.id !== orderId) return o;
-        if (o.status === "배정됨") return { ...o, status: "진행중" as WoStatus };
-        if (o.status === "진행중") {
-          // 작업이 끝나면 연결된 민원도 완료 후보로 넘긴다
-          if (o.vocId) {
-            setVocs((vs) =>
-              vs.map((v) => (v.id === o.vocId ? { ...v, status: "완료" as const } : v))
-            );
-          }
-          return { ...o, status: "완료" as WoStatus };
-        }
-        return o;
-      })
-    );
+  const refresh = useCallback(async () => {
+    const [memberRes, orderRes, vocRes] = await Promise.all([
+      api.get<{ members: Member[] }>("/api/members"),
+      api.get<{ orders: WorkOrder[] }>("/api/work-orders"),
+      api.get<{ vocs: Voc[] }>("/api/vocs"),
+    ]);
+    setMembers(memberRes.members);
+    setOrders(orderRes.orders);
+    setVocs(vocRes.vocs);
   }, []);
 
-  const createOrder = useCallback(
-    (input: NewOrderInput) => {
-      const id = `w${seq}`;
-      setSeq((s) => s + 1);
-      setOrders((prev) => [
-        {
-          id,
-          title: input.title,
-          location: input.location ?? "위치 미지정",
-          due: input.due ?? "오늘",
-          status: "대기",
-          priority: input.priority,
-          source: input.source,
-          specialty: input.specialty,
-          vocId: input.vocId,
-        },
-        ...prev,
-      ]);
-      return id;
+  const bootstrap = useCallback(async () => {
+    try {
+      const { user } = await api.get<{ user: PublicUser }>("/api/auth/me");
+      setMe(user);
+      await refresh();
+    } catch (err) {
+      setMe(null);
+      setMembers([]);
+      setOrders([]);
+      setVocs([]);
+      if (err instanceof ApiClientError && err.status !== 401) {
+        setError(messageOf(err));
+      }
+    } finally {
+      setReady(true);
+    }
+  }, [refresh]);
+
+  useEffect(() => {
+    void bootstrap();
+  }, [bootstrap]);
+
+  const run = useCallback(async <T,>(fn: () => Promise<T>): Promise<T> => {
+    setLoading(true);
+    setError(null);
+    try {
+      return await fn();
+    } catch (err) {
+      const text = messageOf(err);
+      setError(text);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const login = useCallback(
+    async (email: string, password: string) => {
+      await run(async () => {
+        const { user } = await api.post<{ user: PublicUser }>("/api/auth/login", {
+          email,
+          password,
+        });
+        setMe(user);
+        await refresh();
+      });
     },
-    [seq]
+    [refresh, run]
+  );
+
+  const logout = useCallback(async () => {
+    await run(async () => {
+      await api.post("/api/auth/logout");
+      setMe(null);
+      setMembers([]);
+      setOrders([]);
+      setVocs([]);
+    });
+  }, [run]);
+
+  const assign = useCallback(
+    async (orderId: string, memberId: string) => {
+      await run(async () => {
+        const { order } = await api.patch<{ order: WorkOrder }>(`/api/work-orders/${orderId}`, {
+          action: "assign",
+          assigneeId: memberId,
+        });
+        setOrders((prev) => prev.map((o) => (o.id === order.id ? order : o)));
+      });
+    },
+    [run]
+  );
+
+  const advance = useCallback(
+    async (orderId: string) => {
+      await run(async () => {
+        const { order } = await api.patch<{ order: WorkOrder }>(`/api/work-orders/${orderId}`, {
+          action: "advance",
+        });
+        setOrders((prev) => prev.map((o) => (o.id === order.id ? order : o)));
+        if (order.status === "완료" && order.vocId) {
+          setVocs((prev) =>
+            prev.map((v) => (v.id === order.vocId ? { ...v, status: "완료" } : v))
+          );
+        }
+      });
+    },
+    [run]
+  );
+
+  const createOrder = useCallback(
+    async (input: NewOrderInput) => {
+      return run(async () => {
+        const { order } = await api.post<{ order: WorkOrder }>("/api/work-orders", input);
+        setOrders((prev) => [order, ...prev.filter((o) => o.id !== order.id)]);
+        return order;
+      });
+    },
+    [run]
   );
 
   const convertVoc = useCallback(
-    (vocId: string) => {
-      const v = vocs.find((x) => x.id === vocId);
-      const existing = orders.find((o) => o.vocId === vocId);
-      if (existing) return existing.id;
-
-      const id = `w${seq}`;
-      setSeq((s) => s + 1);
-      setOrders((prev) => [
-        {
-          id,
-          title: v ? `${v.tenant.split(" · ")[0]} ${v.title}` : "민원 전환 작업",
-          location: v ? v.tenant.split(" · ")[0] : "위치 미지정",
-          due: "오늘",
-          status: "대기",
-          priority: "높음",
-          source: `민원 #${vocId}`,
-          specialty: v?.specialty ?? "배관·급수",
-          vocId,
-        },
-        ...prev,
-      ]);
-      setVocs((prev) =>
-        prev.map((x) =>
-          x.id === vocId ? { ...x, status: "처리중" as const, workOrderId: id } : x
-        )
-      );
-      return id;
+    async (vocId: string) => {
+      return run(async () => {
+        const { order, voc } = await api.post<{ order: WorkOrder; voc: Voc }>(
+          `/api/vocs/${vocId}/convert`
+        );
+        setOrders((prev) => {
+          const rest = prev.filter((o) => o.id !== order.id);
+          return [order, ...rest];
+        });
+        setVocs((prev) => prev.map((v) => (v.id === voc.id ? voc : v)));
+        return order.id;
+      });
     },
-    [orders, seq, vocs]
+    [run]
   );
 
-  const visibleOrders = useMemo(
-    () => (role === "tech" ? orders.filter((o) => o.assigneeId === me.id) : orders),
-    [me.id, orders, role]
-  );
+  const visibleOrders = orders;
 
   const counts = useMemo(
     () => ({
@@ -252,15 +283,18 @@ export function AppProvider({ children }: { children: ReactNode }) {
     [orders]
   );
 
-  // F-12: "이번 주 아낀 시간"에 실제 근거를 연결 — 배정 건수에 비례해 가산
   const savedHours = useMemo(
     () => BUILDING.savedHoursBase + Math.round(autoAssigned * 1.2),
     [autoAssigned]
   );
 
   const value: AppState = {
+    ready,
+    authenticated: Boolean(me),
+    loading,
+    error,
+    clearError: () => setError(null),
     role,
-    setRole,
     me,
     members,
     techs,
@@ -272,6 +306,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
     doneTodayOf,
     ordersOf,
     recommendFor,
+    login,
+    logout,
+    refresh,
     assign,
     advance,
     createOrder,
@@ -290,6 +327,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     autoAssigned,
     savedHours,
     counts,
+    buildingName: me?.buildingName ?? BUILDING.name,
   };
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;

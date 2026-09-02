@@ -1,4 +1,6 @@
+import AuthGate from "@/components/AuthGate";
 import BottomTabs from "@/components/BottomTabs";
+import ErrorBanner from "@/components/ErrorBanner";
 import Fab from "@/components/Fab";
 import Sheets from "@/components/Sheets";
 import SideNav from "@/components/SideNav";
@@ -15,8 +17,9 @@ export default function AppShellLayout({
       <SideNav />
       <div className="flex min-h-dvh w-full min-w-0 flex-col md:flex-1">
         <TopBar />
+        <ErrorBanner />
         <main className="w-full flex-1 px-4 pb-28 pt-3 md:mx-auto md:max-w-4xl md:px-10 md:pb-16 md:pt-6">
-          {children}
+          <AuthGate>{children}</AuthGate>
         </main>
       </div>
       <Fab />

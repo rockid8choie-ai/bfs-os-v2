@@ -15,7 +15,7 @@ export default function TopBar() {
           priority
         />
         <span className="rounded-full bg-brand-soft px-2 py-0.5 text-[10px] font-bold tracking-wide text-brand">
-          OS v2 BETA
+          OS
         </span>
       </Link>
       <Link

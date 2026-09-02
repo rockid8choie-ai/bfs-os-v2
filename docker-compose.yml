@@ -1,0 +1,14 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: bfs
+      POSTGRES_PASSWORD: bfs
+      POSTGRES_DB: bfs
+    ports:
+      - "5432:5432"
+    volumes:
+      - bfs_pg:/var/lib/postgresql/data
+
+volumes:
+  bfs_pg:

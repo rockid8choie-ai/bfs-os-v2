@@ -29,8 +29,8 @@ export default function AssignSheet() {
   const current = memberById(order.assigneeId);
   const rest = techs.filter((m) => m.id !== rec?.member.id);
 
-  const pick = (memberId: string) => {
-    assign(order.id, memberId);
+  const pick = async (memberId: string) => {
+    await assign(order.id, memberId);
     closeAssign();
   };
 
@@ -120,7 +120,7 @@ export default function AssignSheet() {
         </div>
 
         <button
-          onClick={() => pick(me.id)}
+          onClick={() => me && void pick(me.id)}
           className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-card py-3 text-sm font-bold text-ink2 transition-transform active:scale-[0.98]"
         >
           <CheckIcon className="h-4 w-4" strokeWidth={2.4} />

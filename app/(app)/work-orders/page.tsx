@@ -14,7 +14,8 @@ const BADGE: Record<WoStatus, string> = {
 const FILTERS: Filter[] = ["전체", "대기", "배정됨", "진행중", "완료"];
 
 export default function WorkOrdersPage() {
-  const { visibleOrders, filter, setFilter, advance, openAssign, role, me } = useApp();
+  const { visibleOrders, filter, setFilter, advance, openAssign, role, me, loading } =
+    useApp();
 
   const doneCount = visibleOrders.filter((o) => o.status === "완료").length;
   const total = visibleOrders.length;
@@ -27,7 +28,7 @@ export default function WorkOrdersPage() {
         {role === "manager" ? "작업" : "내 작업"}
       </h1>
       <p className="mt-1 text-sm text-sub">
-        {role === "manager" ? "빌딩 전체" : me.name} · {total}건 중{" "}
+        {role === "manager" ? "빌딩 전체" : me?.name} · {total}건 중{" "}
         <b className="text-ink">{doneCount}건</b> 완료
       </p>
       <div className="mt-3 h-2 overflow-hidden rounded-full bg-card">
@@ -91,15 +92,17 @@ export default function WorkOrdersPage() {
             )}
             {o.status === "배정됨" && (
               <button
-                onClick={() => advance(o.id)}
-                className="mt-2.5 w-full rounded-xl bg-brand-soft py-3 text-sm font-bold text-brand transition-transform active:scale-[0.98]"
+                onClick={() => void advance(o.id)}
+                disabled={loading}
+                className="mt-2.5 w-full rounded-xl bg-brand-soft py-3 text-sm font-bold text-brand transition-transform active:scale-[0.98] disabled:opacity-40"
               >
                 시작
               </button>
             )}
             {o.status === "진행중" && (
               <button
-                onClick={() => advance(o.id)}
+                onClick={() => void advance(o.id)}
+                disabled={loading}
                 className="mt-2.5 w-full rounded-xl bg-brand-soft py-3 text-sm font-bold text-brand transition-transform active:scale-[0.98]"
               >
                 완료 처리

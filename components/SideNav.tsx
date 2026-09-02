@@ -11,7 +11,7 @@ import {
   PlusIcon,
   WrenchIcon,
 } from "@/components/icons";
-import { BUILDING } from "@/lib/mock";
+import { todayLabel } from "@/lib/dates";
 import { useApp } from "@/lib/store";
 
 const NAV = [
@@ -24,7 +24,7 @@ const NAV = [
 /** 데스크톱(md+) 전용 좌측 내비게이션 — 모바일은 BottomTabs가 담당 */
 export default function SideNav() {
   const pathname = usePathname();
-  const { openIntake } = useApp();
+  const { openIntake, buildingName } = useApp();
   const isActive = (href: string) =>
     href === "/" ? pathname === "/" : pathname.startsWith(href);
 
@@ -40,7 +40,7 @@ export default function SideNav() {
           priority
         />
         <span className="rounded-full bg-brand-soft px-2 py-0.5 text-[10px] font-bold tracking-wide text-brand">
-          OS v2 BETA
+          OS
         </span>
       </Link>
 
@@ -85,8 +85,8 @@ export default function SideNav() {
       </nav>
 
       <div className="mt-auto rounded-xl bg-card px-3.5 py-3">
-        <div className="text-[13px] font-bold">{BUILDING.name}</div>
-        <div className="mt-0.5 text-[11px] text-sub">{BUILDING.todayLabel}</div>
+        <div className="text-[13px] font-bold">{buildingName}</div>
+        <div className="mt-0.5 text-[11px] text-sub">{todayLabel()}</div>
       </div>
     </aside>
   );

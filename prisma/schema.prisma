@@ -1,0 +1,114 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum Role {
+  manager
+  tech
+}
+
+enum WoStatus {
+  pending
+  assigned
+  in_progress
+  done
+}
+
+enum Priority {
+  urgent
+  high
+  normal
+}
+
+enum VocStatus {
+  received
+  processing
+  done
+}
+
+model Building {
+  id        String      @id @default(cuid())
+  name      String
+  users     User[]
+  orders    WorkOrder[]
+  vocs      Voc[]
+  createdAt DateTime    @default(now())
+}
+
+model User {
+  id               String      @id @default(cuid())
+  buildingId       String
+  building         Building    @relation(fields: [buildingId], references: [id], onDelete: Cascade)
+  email            String      @unique
+  passwordHash     String
+  name             String
+  role             Role
+  title            String
+  phone            String
+  years            Int
+  specialties      String[]
+  assignedOrders   WorkOrder[] @relation("Assignee")
+  assignedByOrders WorkOrder[] @relation("AssignedBy")
+  createdAt        DateTime    @default(now())
+
+  @@index([buildingId])
+}
+
+model WorkOrder {
+  id           String             @id @default(cuid())
+  buildingId   String
+  building     Building           @relation(fields: [buildingId], references: [id], onDelete: Cascade)
+  title        String
+  location     String
+  due          String
+  status       WoStatus
+  priority     Priority
+  source       String
+  specialty    String?
+  assigneeId   String?
+  assignee     User?              @relation("Assignee", fields: [assigneeId], references: [id])
+  assignedById String?
+  assignedBy   User?              @relation("AssignedBy", fields: [assignedById], references: [id])
+  assignedAt   DateTime?
+  vocId        String?            @unique
+  voc          Voc?               @relation(fields: [vocId], references: [id])
+  events       AssignmentEvent[]
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+
+  @@index([buildingId, status])
+  @@index([assigneeId])
+}
+
+model Voc {
+  id         String     @id @default(cuid())
+  buildingId String
+  building   Building   @relation(fields: [buildingId], references: [id], onDelete: Cascade)
+  title      String
+  tenant     String
+  status     VocStatus
+  aiTag      String
+  specialty  String?
+  workOrder  WorkOrder?
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+
+  @@index([buildingId, status])
+}
+
+model AssignmentEvent {
+  id           String    @id @default(cuid())
+  workOrderId  String
+  workOrder    WorkOrder @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
+  assigneeId   String
+  assignedById String
+  createdAt    DateTime  @default(now())
+
+  @@index([workOrderId])
+}

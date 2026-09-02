@@ -1,5 +1,5 @@
 import Link from "next/link";
-import RoleSwitch from "@/components/RoleSwitch";
+import AccountPanel from "@/components/AccountPanel";
 import TeamList from "@/components/TeamList";
 import { MENU_GROUPS } from "@/lib/mock";
 import {
@@ -80,7 +80,7 @@ export default function MenuPage() {
       ))}
 
       <TeamList />
-      <RoleSwitch />
+      <AccountPanel />
 
       <section className="rise mt-7" style={{ animationDelay: "340ms" }}>
         <h2 className="px-1 text-[13px] font-bold text-sub">설정</h2>
@@ -128,7 +128,7 @@ export default function MenuPage() {
       </section>
 
       <p className="mt-8 text-center text-xs text-sub">
-        BFS OS v2 Beta — 핵심 4개만 전면에, 나머지는 필요한 순간에.
+        BFS OS — 접수·배정·처리. 나머지는 필요할 때.
       </p>
     </div>
   );

@@ -1,4 +1,4 @@
-// BFS OS v2.1 — 목업 데이터 (Supabase 연동 전 단계)
+// 화면 타입·카피. 업무 데이터는 서버/DB가 진실이다.
 export type Priority = "긴급" | "높음" | "보통";
 export type WoStatus = "대기" | "배정됨" | "진행중" | "완료";
 

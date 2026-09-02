@@ -14,8 +14,8 @@ export default function VocPage() {
   const { vocs, orders, convertVoc, openAssign, openMember, memberById, role } = useApp();
 
   // 전환 = 실제 작업지시 생성 + 배정 시트 즉시 호출 (상태만 바꾸던 v2의 반쪽 동작을 대체)
-  const toWork = (vocId: string) => {
-    const orderId = convertVoc(vocId);
+  const toWork = async (vocId: string) => {
+    const orderId = await convertVoc(vocId);
     openAssign(orderId);
   };
 
@@ -91,7 +91,7 @@ export default function VocPage() {
 
               {v.status === "접수" && !linked && role === "manager" && (
                 <button
-                  onClick={() => toWork(v.id)}
+                  onClick={() => void toWork(v.id)}
                   className="mt-3.5 w-full rounded-xl bg-brand-soft py-3 text-sm font-bold text-brand transition-transform active:scale-[0.98]"
                 >
                   작업 지시로 전환

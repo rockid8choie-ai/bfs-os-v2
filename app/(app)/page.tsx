@@ -10,6 +10,7 @@ import {
   MessageIcon,
   WrenchIcon,
 } from "@/components/icons";
+import { todayLabel } from "@/lib/dates";
 import { BUILDING } from "@/lib/mock";
 import { useApp } from "@/lib/store";
 
@@ -57,6 +58,7 @@ export default function Home() {
     memberById,
     savedHours,
     autoAssigned,
+    buildingName,
   } = useApp();
 
   const unassigned = orders.filter((o) => !o.assigneeId && o.status !== "완료");
@@ -130,12 +132,12 @@ export default function Home() {
   return (
     <div>
       <p className="mt-3 text-[13px] font-semibold text-sub">
-        {BUILDING.todayLabel} · {BUILDING.name}
+        {todayLabel()} · {buildingName}
       </p>
       <h1 className="mt-1 text-[24px] font-extrabold leading-snug tracking-[-0.02em]">
         {role === "manager"
           ? "좋은 아침입니다, 소장님"
-          : `좋은 아침입니다, ${me.name}님`}
+          : `좋은 아침입니다, ${me?.name ?? ""}님`}
       </h1>
       <div className="mt-3 flex items-center gap-2">
         <span className="rounded-full bg-brand-soft px-3 py-1.5 text-[12px] font-bold text-brand">

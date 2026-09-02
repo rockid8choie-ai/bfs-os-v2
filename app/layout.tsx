@@ -3,7 +3,7 @@ import "./globals.css";
 import { AppProvider } from "@/lib/store";
 
 export const metadata: Metadata = {
-  title: "BFS OS v2 (Beta)",
+  title: "BFS OS",
   description: "폰 하나로 끝내는 빌딩 시설 운영 — 접수부터 담당자 배정까지",
 };
 

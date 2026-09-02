@@ -25,7 +25,6 @@ export default function Fab() {
     members,
     orders,
     createOrder,
-    assign,
     openAssign,
     me,
     role,
@@ -36,15 +35,19 @@ export default function Fab() {
 
   const [text, setText] = useState("");
   const [route, setRoute] = useState<Classified | null>(null);
-  const [result, setResult] = useState<{ orderId: string; assigneeId: string } | null>(
+  const [result, setResult] = useState<{ orderId: string; assigneeId?: string } | null>(
     null
   );
+  const [busy, setBusy] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
 
   const reset = () => {
     closeIntake();
     setText("");
     setRoute(null);
     setResult(null);
+    setBusy(false);
+    setFormError(null);
   };
 
   // 접수 전에 미리 계산해 보여주는 추천 — 접수 시점에도 같은 규칙이 적용된다
@@ -53,17 +56,24 @@ export default function Fab() {
       ? recommend(members, orders, route.specialty, route.priority)
       : null;
 
-  const submit = () => {
+  const submit = async () => {
     if (!route) return;
-    const orderId = createOrder({
-      title: text.trim(),
-      priority: route.priority,
-      specialty: route.specialty,
-      source: "AI 접수",
-    });
-    const assigneeId = role === "manager" ? (preview?.member.id ?? me.id) : me.id;
-    assign(orderId, assigneeId);
-    setResult({ orderId, assigneeId });
+    setBusy(true);
+    setFormError(null);
+    try {
+      const order = await createOrder({
+        title: text.trim(),
+        priority: route.priority,
+        specialty: route.specialty,
+        source: "AI 접수",
+        autoAssign: true,
+      });
+      setResult({ orderId: order.id, assigneeId: order.assigneeId });
+    } catch (err) {
+      setFormError(err instanceof Error ? err.message : "접수에 실패했습니다.");
+    } finally {
+      setBusy(false);
+    }
   };
 
   const assignee = members.find((m) => m.id === result?.assigneeId);
@@ -98,7 +108,7 @@ export default function Fab() {
                 </p>
                 <button className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-card py-6 text-sm font-semibold text-sub">
                   <CameraIcon className="h-5 w-5" strokeWidth={2} />
-                  사진 추가 (베타에서는 생략 가능)
+                  사진 추가 (곧 제공)
                 </button>
                 <textarea
                   value={text}
@@ -142,18 +152,24 @@ export default function Fab() {
                       </div>
                     ) : (
                       <div className="rounded-xl bg-card p-3 text-[13px] text-sub">
-                        내 작업으로 등록됩니다 · {me.name}
+                        내 작업으로 등록됩니다 · {me?.name}
                       </div>
                     )}
                   </div>
                 )}
 
+                {formError && (
+                  <p className="mt-3 rounded-xl bg-danger-soft px-3 py-2.5 text-[13px] font-semibold text-danger">
+                    {formError}
+                  </p>
+                )}
+
                 <button
-                  disabled={!route}
-                  onClick={submit}
+                  disabled={!route || busy}
+                  onClick={() => void submit()}
                   className="mt-4 w-full rounded-xl bg-brand py-3.5 font-bold text-white transition-transform active:scale-[0.98] disabled:opacity-30"
                 >
-                  접수하기
+                  {busy ? "접수 중…" : "접수하기"}
                 </button>
               </>
             ) : (
@@ -175,7 +191,7 @@ export default function Fab() {
                           </span>
                         </span>
                         <span className="mt-0.5 block text-[11.5px] text-sub">
-                          알림 발송됨 · 작업 탭에서 확인
+                          담당자 배정됨 · 작업 탭에서 확인
                         </span>
                       </span>
                     </div>
