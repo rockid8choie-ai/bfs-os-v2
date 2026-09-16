@@ -5,6 +5,14 @@ export type WoStatus = "대기" | "배정됨" | "진행중" | "완료";
 /** 배정 추천에 쓰는 전문분야 키 — 민원 AI 태그와 같은 어휘를 공유한다 */
 export type Specialty = "배관·급수" | "전기·조명" | "승강기" | "소방·안전" | "공조·환기";
 
+export const SPECIALTIES: Specialty[] = [
+  "배관·급수",
+  "전기·조명",
+  "승강기",
+  "소방·안전",
+  "공조·환기",
+];
+
 export type Role = "manager" | "tech";
 
 export interface Member {

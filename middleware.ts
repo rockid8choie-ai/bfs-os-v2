@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { SESSION_COOKIE } from "@/lib/server/auth-cookie";
 import { verifyToken } from "@/lib/server/jwt";
 
-const PROTECTED = new Set(["/", "/work-orders", "/voc", "/menu"]);
+const PROTECTED = new Set(["/", "/work-orders", "/voc", "/menu", "/account"]);
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -19,5 +19,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/", "/work-orders", "/voc", "/menu"],
+  matcher: ["/", "/work-orders", "/voc", "/menu", "/account"],
 };

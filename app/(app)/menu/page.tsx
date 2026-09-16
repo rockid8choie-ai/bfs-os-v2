@@ -1,5 +1,6 @@
 import Link from "next/link";
 import AccountPanel from "@/components/AccountPanel";
+import PricingLink from "@/components/PricingLink";
 import TeamList from "@/components/TeamList";
 import { MENU_GROUPS } from "@/lib/mock";
 import {
@@ -7,7 +8,6 @@ import {
   BellIcon,
   BuildingIcon,
   CalendarCheckIcon,
-  CardIcon,
   ChartIcon,
   ChevronIcon,
   FileTextIcon,
@@ -100,21 +100,7 @@ export default function MenuPage() {
             </div>
             <ChevronIcon className="h-4 w-4 text-mute" strokeWidth={2.4} />
           </Link>
-          <Link
-            href="/pricing"
-            className="flex items-center gap-3 border-t border-page px-4 py-3.5 active:bg-line"
-          >
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-soft text-brand">
-              <CardIcon className="h-5 w-5" strokeWidth={2} />
-            </span>
-            <div className="min-w-0 flex-1">
-              <div className="text-[15px] font-semibold">이용 안내</div>
-              <div className="mt-0.5 text-xs text-sub">
-                지금은 무료 체험 기간이에요
-              </div>
-            </div>
-            <ChevronIcon className="h-4 w-4 text-mute" strokeWidth={2.4} />
-          </Link>
+          <PricingLink />
           <div className="flex items-center gap-3 border-t border-page px-4 py-3.5 opacity-50">
             <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-line text-ink2">
               <SlidersIcon className="h-5 w-5" strokeWidth={2} />

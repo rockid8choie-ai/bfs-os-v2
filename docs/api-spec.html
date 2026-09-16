@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <title>BFS OS API 기능 명세서</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css"
+  />
+  <style>
+    @page { size: A4; margin: 16mm 16mm 18mm; }
+    * { box-sizing: border-box; }
+    body {
+      font-family: Pretendard, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+      color: #191f28;
+      font-size: 12px;
+      line-height: 1.55;
+      margin: 0;
+    }
+    h1 { font-size: 26px; letter-spacing: -0.03em; margin: 0 0 6px; }
+    h2 { font-size: 16px; margin: 22px 0 8px; border-bottom: 2px solid #3182f6; padding-bottom: 4px; }
+    h3 { font-size: 13.5px; margin: 16px 0 6px; }
+    .sub { color: #4e5968; margin: 0 0 14px; }
+    .meta { color: #8b95a1; font-size: 11px; margin-bottom: 20px; }
+    table { width: 100%; border-collapse: collapse; margin: 8px 0 14px; }
+    th, td { border: 1px solid #e5e8eb; padding: 6px 8px; text-align: left; vertical-align: top; }
+    th { background: #f2f4f6; font-size: 11px; }
+    code, pre { font-family: Consolas, "Noto Sans Mono", monospace; font-size: 10.5px; }
+    pre {
+      background: #f7f8fa;
+      border: 1px solid #e5e8eb;
+      border-radius: 8px;
+      padding: 10px 12px;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+    .method { font-weight: 800; }
+    .get { color: #059669; }
+    .post { color: #3182f6; }
+    .patch { color: #d97706; }
+    .badge {
+      display: inline-block;
+      background: #e8f3ff;
+      color: #3182f6;
+      border-radius: 999px;
+      padding: 1px 8px;
+      font-size: 10.5px;
+      font-weight: 700;
+    }
+    .note { color: #4e5968; }
+    .ep { page-break-inside: avoid; margin-bottom: 8px; }
+  </style>
+</head>
+<body>
+  <h1>BFS OS API 기능 명세서</h1>
+  <p class="sub">빌딩 시설 운영 — 접수, 담당자 배정, 민원 전환을 위한 REST API</p>
+  <p class="meta">
+    문서 버전 1.0 · 2026-09-02 · Base URL
+    <strong>https://bfs-os-v2.vercel.app</strong>
+    · 저장소 https://github.com/rockid8choie-ai/bfs-os-v2
+  </p>
+
+  <h2>1. 개요</h2>
+  <p>
+    프론트엔드(Next.js)와 같은 애플리케이션에 구현된 REST API입니다.
+    요청은 JSON으로 주고받으며, 업무 데이터는 Postgres(Neon)에 저장됩니다.
+  </p>
+  <table>
+    <tr><th>항목</th><th>내용</th></tr>
+    <tr><td>프로토콜</td><td>HTTPS, JSON</td></tr>
+    <tr><td>인증</td><td>로그인 성공 시 httpOnly 쿠키 <code>bfs_session</code> (JWT, 유효기간 7일)</td></tr>
+    <tr><td>권한</td><td>같은 건물만 조회. 소장(manager)은 전체, 시설팀(tech)은 자기 작업만</td></tr>
+    <tr><td>성공 형식</td><td><code>{ "data": ... }</code></td></tr>
+    <tr><td>실패 형식</td><td><code>{ "error": { "code": "...", "message": "한글 설명" } }</code></td></tr>
+  </table>
+
+  <h2>2. 상태 코드 · 에러 코드</h2>
+  <table>
+    <tr><th>HTTP</th><th>code</th><th>의미</th></tr>
+    <tr><td>200 / 201</td><td>—</td><td>성공. 생성은 201</td></tr>
+    <tr><td>400</td><td>VALIDATION</td><td>요청 본문 검증 실패</td></tr>
+    <tr><td>401</td><td>UNAUTHORIZED</td><td>미로그인, 세션 만료, 잘못된 비밀번호</td></tr>
+    <tr><td>403</td><td>FORBIDDEN</td><td>역할 권한 없음 (예: 시설팀의 민원 전환)</td></tr>
+    <tr><td>404</td><td>NOT_FOUND</td><td>작업/민원 없음</td></tr>
+    <tr><td>500</td><td>INTERNAL</td><td>서버 오류</td></tr>
+    <tr><td>503</td><td>UNAVAILABLE</td><td>DB 연결 실패 (health)</td></tr>
+  </table>
+  <pre>{
+  "error": {
+    "code": "UNAUTHORIZED",
+    "message": "로그인이 필요합니다."
+  }
+}</pre>
+
+  <h2>3. 공통 데이터</h2>
+  <h3>화면 표기 값 (응답에 사용)</h3>
+  <table>
+    <tr><th>필드</th><th>허용 값</th></tr>
+    <tr><td>작업 status</td><td>대기, 배정됨, 진행중, 완료</td></tr>
+    <tr><td>우선순위 priority</td><td>긴급, 높음, 보통</td></tr>
+    <tr><td>전문분야 specialty</td><td>배관·급수, 전기·조명, 승강기, 소방·안전, 공조·환기</td></tr>
+    <tr><td>민원 status</td><td>접수, 처리중, 완료</td></tr>
+    <tr><td>역할 role</td><td>manager, tech</td></tr>
+  </table>
+
+  <h3>데모 계정 (비밀번호 공통 demo1234)</h3>
+  <table>
+    <tr><th>역할</th><th>이름</th><th>이메일</th></tr>
+    <tr><td>관리소장</td><td>박정호</td><td>park@bfs.local</td></tr>
+    <tr><td>시설팀</td><td>김태식</td><td>kim@bfs.local</td></tr>
+    <tr><td>시설팀</td><td>이현우</td><td>lee@bfs.local</td></tr>
+    <tr><td>시설팀</td><td>정민석</td><td>jung@bfs.local</td></tr>
+  </table>
+
+  <h2>4. 엔드포인트 목록</h2>
+  <table>
+    <tr><th>Method</th><th>경로</th><th>인증</th><th>기능</th></tr>
+    <tr><td class="method get">GET</td><td>/api/health</td><td>불필요</td><td>서버·DB 생존 확인</td></tr>
+    <tr><td class="method post">POST</td><td>/api/auth/signup</td><td>불필요</td><td>빌딩 개설 + 관리소장 가입, 세션 쿠키 발급</td></tr>
+    <tr><td class="method post">POST</td><td>/api/auth/login</td><td>불필요</td><td>로그인, 세션 쿠키 발급</td></tr>
+    <tr><td class="method get">GET</td><td>/api/auth/me</td><td>필요</td><td>현재 로그인 사용자</td></tr>
+    <tr><td class="method patch">PATCH</td><td>/api/auth/me</td><td>필요</td><td>프로필 수정 (이름·직함·연락처·전문분야)</td></tr>
+    <tr><td class="method delete">DELETE</td><td>/api/auth/me</td><td>필요</td><td>회원 탈퇴 — 소장은 빌딩 전체 삭제, 팀원은 본인만. body: { password, confirm: "탈퇴" }</td></tr>
+    <tr><td class="method post">POST</td><td>/api/auth/password</td><td>필요</td><td>비밀번호 변경 { currentPassword, newPassword }</td></tr>
+    <tr><td class="method post">POST</td><td>/api/auth/logout</td><td>—</td><td>세션 쿠키 삭제</td></tr>
+    <tr><td class="method get">GET</td><td>/api/members</td><td>필요</td><td>같은 건물 구성원 목록</td></tr>
+    <tr><td class="method post">POST</td><td>/api/members</td><td>필요(소장)</td><td>시설팀(tech) 계정 등록</td></tr>
+    <tr><td class="method delete">DELETE</td><td>/api/members/:id</td><td>필요(소장)</td><td>팀원 삭제 — 배정 작업은 미배정으로</td></tr>
+    <tr><td class="method get">GET</td><td>/api/billing</td><td>필요</td><td>현재 플랜 + 결제 이력</td></tr>
+    <tr><td class="method post">POST</td><td>/api/billing/checkout</td><td>필요(소장)</td><td>결제 준비 { plan: "standard"|"pro" } → orderId·clientKey</td></tr>
+    <tr><td class="method post">POST</td><td>/api/billing/confirm</td><td>필요</td><td>토스 결제 승인 { paymentKey, orderId, amount } — 금액 대조 후 플랜 적용</td></tr>
+    <tr><td class="method delete">DELETE</td><td>/api/billing</td><td>필요(소장)</td><td>무료 플랜으로 전환</td></tr>
+    <tr><td class="method get">GET</td><td>/api/work-orders</td><td>필요</td><td>작업 목록 (역할별 필터)</td></tr>
+    <tr><td class="method post">POST</td><td>/api/work-orders</td><td>필요</td><td>작업 접수. 기본 자동 배정</td></tr>
+    <tr><td class="method patch">PATCH</td><td>/api/work-orders/:id</td><td>필요</td><td>담당자 배정 또는 상태 진행</td></tr>
+    <tr><td class="method get">GET</td><td>/api/vocs</td><td>필요</td><td>민원 목록</td></tr>
+    <tr><td class="method post">POST</td><td>/api/vocs/:id/convert</td><td>필요(소장)</td><td>민원 → 작업지시 전환</td></tr>
+  </table>
+
+  <h2>5. 상세 명세</h2>
+
+  <div class="ep">
+    <h3><span class="method get">GET</span> /api/health <span class="badge">공개</span></h3>
+    <p class="note">데이터베이스 연결을 확인합니다. 인증이 필요 없습니다.</p>
+    <p><strong>성공 200</strong></p>
+    <pre>{
+  "data": {
+    "ok": true,
+    "service": "bfs-os",
+    "time": "2026-09-02T05:24:34.131Z"
+  }
+}</pre>
+    <p><strong>실패 503</strong> DB 미연결 — code UNAVAILABLE</p>
+  </div>
+
+  <div class="ep">
+    <h3><span class="method post">POST</span> /api/auth/login <span class="badge">공개</span></h3>
+    <p class="note">이메일·비밀번호를 확인한 뒤 JWT를 발급하고 <code>bfs_session</code> 쿠키를 심습니다. 응답 body에도 token을 포함합니다.</p>
+    <p><strong>Request</strong></p>
+    <pre>{
+  "email": "park@bfs.local",
+  "password": "demo1234"
+}</pre>
+    <table>
+      <tr><th>필드</th><th>필수</th><th>규칙</th></tr>
+      <tr><td>email</td><td>O</td><td>이메일 형식. 소문자로 정규화</td></tr>
+      <tr><td>password</td><td>O</td><td>8자 이상</td></tr>
+    </table>
+    <p><strong>성공 200</strong></p>
+    <pre>{
+  "data": {
+    "token": "&lt;jwt&gt;",
+    "user": {
+      "id": "cmtj...",
+      "name": "박정호",
+      "role": "manager",
+      "title": "관리소장",
+      "email": "park@bfs.local",
+      "phone": "010-2841-0033",
+      "years": 12,
+      "specialty": ["소방·안전"],
+      "buildingId": "cmtj...",
+      "buildingName": "역삼타워"
+    }
+  }
+}</pre>
+    <p><strong>실패</strong> 400 이메일/비밀번호 형식 · 401 이메일 또는 비밀번호가 올바르지 않습니다.</p>
+  </div>
+
+  <div class="ep">
+    <h3><span class="method get">GET</span> /api/auth/me <span class="badge">인증</span></h3>
+    <p class="note">쿠키의 JWT로 현재 사용자를 반환합니다.</p>
+    <p><strong>성공 200</strong> <code>{ "data": { "user": { ... } } }</code> (login의 user와 동일 형태)</p>
+    <p><strong>실패 401</strong> 로그인이 필요합니다. / 세션이 만료되었습니다.</p>
+  </div>
+
+  <div class="ep">
+    <h3><span class="method post">POST</span> /api/auth/logout</h3>
+    <p class="note">세션 쿠키를 삭제합니다. 본문 없음.</p>
+    <p><strong>성공 200</strong></p>
+    <pre>{ "data": { "ok": true } }</pre>
+  </div>
+
+  <div class="ep">
+    <h3><span class="method get">GET</span> /api/members <span class="badge">인증</span></h3>
+    <p class="note">같은 건물 구성원과 현재 부하를 반환합니다. 배정 시트에서 사용합니다.</p>
+    <p><strong>성공 200</strong></p>
+    <pre>{
+  "data": {
+    "members": [
+      {
+        "id": "...",
+        "name": "김태식",
+        "role": "tech",
+        "title": "시설팀 · 기계",
+        "specialty": ["배관·급수", "공조·환기"],
+        "phone": "010-5521-7788",
+        "years": 8,
+        "load": 2,
+        "doneToday": 0
+      }
+    ]
+  }
+}</pre>
+    <p>load = 상태가 배정됨·진행중인 건수. doneToday = 완료 건수.</p>
+  </div>
+
+  <div class="ep">
+    <h3><span class="method get">GET</span> /api/work-orders <span class="badge">인증</span></h3>
+    <p class="note">소장: 건물 전체. 시설팀: <code>assigneeId === 나</code> 인 작업만.</p>
+    <p><strong>성공 200</strong></p>
+    <pre>{
+  "data": {
+    "orders": [
+      {
+        "id": "...",
+        "title": "302호 천장 누수 보수",
+        "location": "3F 302호",
+        "due": "오늘",
+        "status": "대기",
+        "priority": "높음",
+        "source": "민원",
+        "specialty": "배관·급수",
+        "assigneeId": null,
+        "assignedBy": null,
+        "assignedAt": null,
+        "vocId": "..."
+      }
+    ]
+  }
+}</pre>
+  </div>
+
+  <div class="ep">
+    <h3><span class="method post">POST</span> /api/work-orders <span class="badge">인증</span></h3>
+    <p class="note">작업을 생성합니다. <code>autoAssign</code>이 false가 아니면 담당자를 붙입니다. 소장은 추천 규칙, 시설팀은 본인에게 배정합니다.</p>
+    <p><strong>Request</strong></p>
+    <pre>{
+  "title": "3층 화장실 온수가 안 나와요",
+  "location": "3F 화장실",
+  "priority": "높음",
+  "specialty": "배관·급수",
+  "source": "AI 접수",
+  "due": "오늘",
+  "autoAssign": true
+}</pre>
+    <table>
+      <tr><th>필드</th><th>필수</th><th>규칙</th></tr>
+      <tr><td>title</td><td>O</td><td>2~120자</td></tr>
+      <tr><td>priority</td><td>O</td><td>긴급 | 높음 | 보통</td></tr>
+      <tr><td>specialty</td><td>O</td><td>전문분야 enum</td></tr>
+      <tr><td>source</td><td>X</td><td>기본값 "AI 접수"</td></tr>
+      <tr><td>location, due</td><td>X</td><td>없으면 "위치 미지정", "오늘"</td></tr>
+      <tr><td>assigneeId</td><td>X</td><td>지정 시 해당 담당자</td></tr>
+      <tr><td>autoAssign</td><td>X</td><td>기본 true. false면 대기 상태로만 생성</td></tr>
+      <tr><td>vocId</td><td>X</td><td>민원과 연결할 때</td></tr>
+    </table>
+    <p><strong>성공 201</strong> <code>{ "data": { "order": { ... } } }</code></p>
+    <p><strong>실패 400</strong> 제목을 2자 이상 입력해 주세요. 등</p>
+  </div>
+
+  <div class="ep">
+    <h3><span class="method patch">PATCH</span> /api/work-orders/:id <span class="badge">인증</span></h3>
+    <p class="note"><code>action</code>으로 배정과 상태 진행을 나눕니다.</p>
+    <p><strong>배정 Request</strong></p>
+    <pre>{ "action": "assign", "assigneeId": "&lt;userId&gt;" }</pre>
+    <p>소장: 건물 내 아무 담당자. 시설팀: 자기 id만. 완료된 작업은 담당자만 바꾸고 상태는 유지합니다. 배정 이력(AssignmentEvent)을 남깁니다.</p>
+    <p><strong>진행 Request</strong></p>
+    <pre>{ "action": "advance" }</pre>
+    <p>배정됨 → 진행중 → 완료. 완료 시 연결된 민원도 트랜잭션으로 완료. 대기(미배정) 작업은 400.</p>
+    <p><strong>성공 200</strong> <code>{ "data": { "order": { ... } } }</code></p>
+    <p><strong>실패</strong> 400 담당자를 먼저 배정해야 시작할 수 있습니다. · 403 배정받은 작업만 처리할 수 있습니다. · 404 작업을 찾을 수 없습니다.</p>
+  </div>
+
+  <div class="ep">
+    <h3><span class="method get">GET</span> /api/vocs <span class="badge">인증</span></h3>
+    <p class="note">같은 건물 민원 목록. 연결된 작업은 <code>workOrderId</code>.</p>
+    <p><strong>성공 200</strong></p>
+    <pre>{
+  "data": {
+    "vocs": [
+      {
+        "id": "...",
+        "title": "천장에서 물이 떨어져요",
+        "tenant": "302호 · 그린테크",
+        "createdAt": "오늘 08:40",
+        "status": "접수",
+        "aiTag": "배관·누수",
+        "specialty": "배관·급수",
+        "workOrderId": "..."
+      }
+    ]
+  }
+}</pre>
+  </div>
+
+  <div class="ep">
+    <h3><span class="method post">POST</span> /api/vocs/:id/convert <span class="badge">인증 · 소장</span></h3>
+    <p class="note">민원을 작업지시로 전환합니다. 이미 연결된 작업이 있으면 새로 만들지 않고 기존 id를 반환합니다. 시설팀은 403.</p>
+    <p><strong>성공 200</strong> (기존 작업) / <strong>201</strong> (신규 생성)</p>
+    <pre>{
+  "data": {
+    "order": { "id": "...", "title": "302호 천장에서 물이 떨어져요", "status": "대기", ... },
+    "voc": { "id": "...", "status": "처리중", "workOrderId": "..." },
+    "created": true
+  }
+}</pre>
+    <p><strong>실패</strong> 403 민원 전환은 관리소장만 할 수 있습니다. · 404 민원을 찾을 수 없습니다.</p>
+  </div>
+
+  <h2>6. 호출 흐름</h2>
+  <pre>POST /api/auth/login
+  → 쿠키 bfs_session 저장
+
+GET /api/auth/me
+GET /api/members
+GET /api/work-orders
+GET /api/vocs
+
+POST /api/work-orders          접수 + 자동 배정
+PATCH /api/work-orders/:id     { "action": "assign" }  담당자 변경
+PATCH /api/work-orders/:id     { "action": "advance" } 시작 또는 완료
+POST /api/vocs/:id/convert     민원 → 작업
+
+POST /api/auth/logout</pre>
+
+  <h2>7. 권한 요약</h2>
+  <table>
+    <tr><th>동작</th><th>manager</th><th>tech</th></tr>
+    <tr><td>작업 목록</td><td>건물 전체</td><td>자기 배정분만</td></tr>
+    <tr><td>작업 접수</td><td>가능 (추천 배정)</td><td>가능 (본인 배정)</td></tr>
+    <tr><td>타인에게 배정</td><td>가능</td><td>불가 (본인만)</td></tr>
+    <tr><td>시작/완료</td><td>가능</td><td>자기 작업만</td></tr>
+    <tr><td>민원 조회</td><td>가능</td><td>가능</td></tr>
+    <tr><td>민원 전환</td><td>가능</td><td>403</td></tr>
+  </table>
+
+  <p class="meta" style="margin-top: 28px;">
+    BFS OS · API 기능 명세서 v1.0 · 구현 기준 커밋 main
+  </p>
+</body>
+</html>

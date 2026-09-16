@@ -5,10 +5,12 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import Logo from "@/components/Logo";
 import { DEMO_ACCOUNTS } from "@/lib/demo-accounts";
+import { useIsNativeApp } from "@/lib/native";
 import { useApp } from "@/lib/store";
 
 function LoginForm() {
   const { login, authenticated, ready } = useApp();
+  const native = useIsNativeApp();
   const router = useRouter();
   const search = useSearchParams();
   const next = search.get("next") || "/";
@@ -93,6 +95,14 @@ function LoginForm() {
         </button>
       </form>
 
+      <p className="mt-4 text-center text-[13px] text-sub">
+        처음이신가요?{" "}
+        <Link href="/signup" className="font-bold text-brand">
+          우리 빌딩 시작하기
+        </Link>
+      </p>
+
+      {!native && (
       <div className="mt-8">
         <p className="px-1 text-[12px] font-bold text-sub">데모 — 누르면 바로 들어갑니다</p>
         <div className="mt-2 overflow-hidden rounded-[20px] bg-card">
@@ -118,6 +128,7 @@ function LoginForm() {
         </div>
         <p className="mt-2 px-1 text-[11px] text-sub">비밀번호는 모두 demo1234 입니다.</p>
       </div>
+      )}
 
       <p className="mt-auto pt-10 text-center text-[13px] font-semibold text-sub">
         <Link href="/landing" className="text-ink2">

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Avatar from "@/components/Avatar";
 import { useApp } from "@/lib/store";
@@ -27,16 +28,24 @@ export default function AccountPanel() {
             ? "건물 전체 작업과 민원을 보고 담당자를 배정합니다."
             : "배정받은 작업만 보고 시작·완료를 기록합니다."}
         </p>
-        <button
-          disabled={loading}
-          onClick={async () => {
-            await logout();
-            router.replace("/login");
-          }}
-          className="mt-3.5 w-full rounded-xl bg-page py-3 text-[13px] font-bold text-ink2 transition-transform active:scale-[0.98] disabled:opacity-40"
-        >
-          로그아웃
-        </button>
+        <div className="mt-3.5 flex gap-2">
+          <Link
+            href="/account"
+            className="w-full rounded-xl bg-brand-soft py-3 text-center text-[13px] font-bold text-brand transition-transform active:scale-[0.98]"
+          >
+            계정 관리
+          </Link>
+          <button
+            disabled={loading}
+            onClick={async () => {
+              await logout();
+              router.replace("/login");
+            }}
+            className="w-full rounded-xl bg-page py-3 text-[13px] font-bold text-ink2 transition-transform active:scale-[0.98] disabled:opacity-40"
+          >
+            로그아웃
+          </button>
+        </div>
       </div>
     </section>
   );

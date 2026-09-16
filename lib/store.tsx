@@ -29,6 +29,31 @@ interface NewOrderInput {
 
 type PublicUser = Member & { email?: string; buildingName?: string };
 
+interface SignupInput {
+  buildingName: string;
+  name: string;
+  email: string;
+  password: string;
+  phone?: string;
+}
+
+interface ProfileInput {
+  name?: string;
+  title?: string;
+  phone?: string;
+  specialties?: Specialty[];
+}
+
+interface NewMemberInput {
+  name: string;
+  email: string;
+  password: string;
+  title?: string;
+  phone?: string;
+  years?: number;
+  specialties: Specialty[];
+}
+
 interface AppState {
   ready: boolean;
   authenticated: boolean;
@@ -52,8 +77,14 @@ interface AppState {
   recommendFor: (o: WorkOrder) => Recommendation | null;
 
   login: (email: string, password: string) => Promise<void>;
+  signup: (input: SignupInput) => Promise<void>;
   logout: () => Promise<void>;
   refresh: () => Promise<void>;
+  updateProfile: (input: ProfileInput) => Promise<void>;
+  changePassword: (currentPassword: string, newPassword: string) => Promise<void>;
+  deleteAccount: (password: string) => Promise<void>;
+  addMember: (input: NewMemberInput) => Promise<void>;
+  removeMember: (id: string) => Promise<void>;
 
   assign: (orderId: string, memberId: string) => Promise<void>;
   advance: (orderId: string) => Promise<void>;
@@ -198,6 +229,17 @@ export function AppProvider({ children }: { children: ReactNode }) {
     [refresh, run]
   );
 
+  const signup = useCallback(
+    async (input: SignupInput) => {
+      await run(async () => {
+        const { user } = await api.post<{ user: PublicUser }>("/api/auth/signup", input);
+        setMe(user);
+        await refresh();
+      });
+    },
+    [refresh, run]
+  );
+
   const logout = useCallback(async () => {
     await run(async () => {
       await api.post("/api/auth/logout");
@@ -207,6 +249,62 @@ export function AppProvider({ children }: { children: ReactNode }) {
       setVocs([]);
     });
   }, [run]);
+
+  const updateProfile = useCallback(
+    async (input: ProfileInput) => {
+      await run(async () => {
+        const { user } = await api.patch<{ user: PublicUser }>("/api/auth/me", input);
+        setMe(user);
+        setMembers((prev) => prev.map((m) => (m.id === user.id ? { ...m, ...user } : m)));
+      });
+    },
+    [run]
+  );
+
+  const changePassword = useCallback(
+    async (currentPassword: string, newPassword: string) => {
+      await run(async () => {
+        await api.post("/api/auth/password", { currentPassword, newPassword });
+      });
+    },
+    [run]
+  );
+
+  const deleteAccount = useCallback(
+    async (password: string) => {
+      await run(async () => {
+        await api.del("/api/auth/me", { password, confirm: "탈퇴" });
+        setMe(null);
+        setMembers([]);
+        setOrders([]);
+        setVocs([]);
+      });
+    },
+    [run]
+  );
+
+  const addMember = useCallback(
+    async (input: NewMemberInput) => {
+      await run(async () => {
+        const { member } = await api.post<{ member: Member }>("/api/members", input);
+        setMembers((prev) => [...prev, member]);
+      });
+    },
+    [run]
+  );
+
+  const removeMember = useCallback(
+    async (id: string) => {
+      await run(async () => {
+        await api.del(`/api/members/${id}`);
+        setMembers((prev) => prev.filter((m) => m.id !== id));
+        setOrders((prev) =>
+          prev.map((o) => (o.assigneeId === id ? { ...o, assigneeId: undefined } : o))
+        );
+      });
+    },
+    [run]
+  );
 
   const assign = useCallback(
     async (orderId: string, memberId: string) => {
@@ -307,8 +405,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
     ordersOf,
     recommendFor,
     login,
+    signup,
     logout,
     refresh,
+    updateProfile,
+    changePassword,
+    deleteAccount,
+    addMember,
+    removeMember,
     assign,
     advance,
     createOrder,

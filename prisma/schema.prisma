@@ -32,13 +32,49 @@ enum VocStatus {
   done
 }
 
+enum Plan {
+  free
+  standard
+  pro
+}
+
+enum PaymentStatus {
+  ready
+  paid
+  failed
+  canceled
+}
+
 model Building {
-  id        String      @id @default(cuid())
-  name      String
-  users     User[]
-  orders    WorkOrder[]
-  vocs      Voc[]
-  createdAt DateTime    @default(now())
+  id            String      @id @default(cuid())
+  name          String
+  plan          Plan        @default(free)
+  planUpdatedAt DateTime?
+  users         User[]
+  orders        WorkOrder[]
+  vocs          Voc[]
+  payments      Payment[]
+  createdAt     DateTime    @default(now())
+}
+
+model Payment {
+  id         String        @id @default(cuid())
+  buildingId String
+  building   Building      @relation(fields: [buildingId], references: [id], onDelete: Cascade)
+  orderId    String        @unique
+  paymentKey String?       @unique
+  plan       Plan
+  amount     Int
+  status     PaymentStatus @default(ready)
+  method     String?
+  receiptUrl String?
+  failReason String?
+  requestedById String?
+  approvedAt DateTime?
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+
+  @@index([buildingId, status])
 }
 
 model User {
