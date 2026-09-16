@@ -1,0 +1,14 @@
+{
+  "appId": "app.bfsos.ios",
+  "appName": "BFS OS",
+  "webDir": "www",
+  "server": {
+    "url": "https://bfs-os-v2.vercel.app",
+    "allowNavigation": ["bfs-os-v2.vercel.app"]
+  },
+  "ios": {
+    "contentInset": "automatic",
+    "backgroundColor": "#ffffff",
+    "appendUserAgent": "BFSOSApp"
+  }
+}

@@ -42,3 +42,9 @@ yarn-error.log*
 next-env.d.ts
 
 .vercel
+
+# ios shell
+ios-shell/node_modules
+ios-shell/ios/App/App/public
+ios-shell/ios/App/out
+ios-shell/ios/App/App.xcarchive
