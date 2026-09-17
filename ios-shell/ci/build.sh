@@ -46,6 +46,10 @@ xcodebuild -exportArchive -archivePath "$PWD/App.xcarchive" \
   -allowProvisioningUpdates "${AUTH[@]}"
 
 echo "== Upload to TestFlight =="
-xcrun altool --upload-app -f out/*.ipa -t ios \
-  --apiKey "$ASC_KEY_ID" --apiIssuer "$ASC_ISSUER_ID"
+UPLOAD_OUT=$(xcrun altool --upload-app -f out/*.ipa -t ios   --apiKey "$ASC_KEY_ID" --apiIssuer "$ASC_ISSUER_ID" 2>&1) || true
+echo "$UPLOAD_OUT"
+# altool이 에러를 찍고도 0으로 끝나는 경우가 있어 출력으로 성공을 확정한다.
+if ! echo "$UPLOAD_OUT" | grep -q "UPLOAD SUCCEEDED"; then
+  echo "!! TestFlight upload FAILED"; exit 1
+fi
 echo "== DONE =="
