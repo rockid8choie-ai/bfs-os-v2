@@ -1,5 +1,9 @@
-// 공개 요금표(빌딩당 월) — 서버·클라이언트 공용. fm-os BM 전략 A안 그대로.
+// 공개 요금표(빌딩당 월) — 서버·클라이언트 공용.
 export type PlanKey = "free" | "standard" | "pro";
+
+// 당분간 전부 무료(2026-09-17 결정) — 유료 전환 시 true로 바꾸면
+// 요금 페이지의 플랜 카드·결제 버튼과 결제 API가 함께 열린다.
+export const BILLING_LIVE = false;
 
 export const PLANS: Record<
   PlanKey,

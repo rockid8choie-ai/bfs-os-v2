@@ -5,9 +5,17 @@ import { useEffect, useState } from "react";
 import { CheckIcon, SparkIcon } from "@/components/icons";
 import { api } from "@/lib/api";
 import { useIsNativeApp } from "@/lib/native";
-import { PLANS, won, type PlanKey } from "@/lib/plans";
+import { BILLING_LIVE, PLANS, won, type PlanKey } from "@/lib/plans";
 import { useApp } from "@/lib/store";
 import { loadTossPayments } from "@/lib/toss";
+
+const FREE_FEATURES = [
+  "민원 접수 + 작업지시 무제한",
+  "AI 자동 분류 · 담당자 배정",
+  "시설팀 좌석 제한 없음",
+  "입주사 포털 (요청 무제한)",
+  "주간·월간 리포트 (준비 중)",
+];
 
 type Billing = {
   plan: PlanKey;
@@ -145,6 +153,50 @@ export default function PricingPage() {
   };
 
   const currentPlan: PlanKey = billing?.plan ?? "free";
+
+  // 당분간 전부 무료 — 금액·결제 없이 안내만. (유료 전환은 lib/plans.ts의 BILLING_LIVE)
+  if (!BILLING_LIVE) {
+    return (
+      <div className="md:max-w-2xl">
+        <h1 className="mt-3 text-[24px] font-extrabold tracking-[-0.02em]">이용 안내</h1>
+        <p className="mt-1 text-sm leading-relaxed text-sub">
+          지금은 <b className="text-ink">전부 무료</b>입니다. 카드 등록도 없습니다.
+        </p>
+
+        <div className="mt-5 rounded-[20px] bg-brand-soft p-5">
+          <div className="flex items-center gap-2">
+            <SparkIcon className="h-4 w-4 text-brand" strokeWidth={2.4} />
+            <span className="text-[13px] font-bold text-brand">베타 — 기능 제한 없음</span>
+          </div>
+          <div className="mt-2 text-[20px] font-extrabold tracking-[-0.02em]">
+            빌딩 1개부터, 전부 무료
+          </div>
+          <ul className="mt-4 space-y-2 text-sm">
+            {FREE_FEATURES.map((f) => (
+              <li key={f} className="flex items-center gap-2">
+                <CheckIcon className="h-4 w-4 shrink-0 text-brand" strokeWidth={3} />
+                <span>{f}</span>
+              </li>
+            ))}
+          </ul>
+          {!authenticated && (
+            <Link
+              href="/signup"
+              className="mt-4 block w-full rounded-xl bg-brand py-3.5 text-center text-sm font-bold text-white active:opacity-80"
+            >
+              무료로 시작하기
+            </Link>
+          )}
+        </div>
+
+        <div className="mt-3 rounded-[20px] bg-card p-5 text-xs leading-relaxed text-sub">
+          민원을 넣는 <b className="text-ink">입주사는 언제나 무료</b>입니다. 정식 요금은
+          베타가 끝나기 전에 미리 안내드리고, 그때까지 쓰신 데이터와 이력은 그대로
+          유지됩니다.
+        </div>
+      </div>
+    );
+  }
 
   // 네이티브 앱(스토어 배포판)에서는 결제·금액을 노출하지 않는다.
   if (native) {

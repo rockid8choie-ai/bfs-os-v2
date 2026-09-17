@@ -18,8 +18,8 @@ export default function PricingLink() {
         <CardIcon className="h-5 w-5" strokeWidth={2} />
       </span>
       <div className="min-w-0 flex-1">
-        <div className="text-[15px] font-semibold">요금</div>
-        <div className="mt-0.5 text-xs text-sub">빌딩당 월 요금, 전부 공개</div>
+        <div className="text-[15px] font-semibold">이용 안내</div>
+        <div className="mt-0.5 text-xs text-sub">지금은 전부 무료예요</div>
       </div>
       <ChevronIcon className="h-4 w-4 text-mute" strokeWidth={2.4} />
     </Link>

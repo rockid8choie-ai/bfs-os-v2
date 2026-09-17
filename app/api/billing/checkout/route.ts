@@ -2,6 +2,7 @@ import { prisma } from "@/lib/server/db";
 import { requireUser } from "@/lib/server/auth";
 import { forbidden, jsonError, jsonOk } from "@/lib/server/errors";
 import { newOrderId, PLANS, TOSS_CLIENT_KEY } from "@/lib/server/billing";
+import { BILLING_LIVE } from "@/lib/plans";
 import { checkoutSchema, parseBody } from "@/lib/server/validators";
 
 export const runtime = "nodejs";
@@ -10,6 +11,7 @@ export const runtime = "nodejs";
 export async function POST(request: Request) {
   try {
     const me = await requireUser();
+    if (!BILLING_LIVE) throw forbidden("지금은 무료 기간이라 결제를 받지 않습니다.");
     if (me.role !== "manager") throw forbidden("결제는 관리소장만 할 수 있습니다.");
 
     const raw = await request.json().catch(() => null);
