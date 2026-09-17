@@ -52,6 +52,8 @@
 
 ## API
 
+제출용 PDF 명세: [`docs/BFS-OS-API-spec.pdf`](docs/BFS-OS-API-spec.pdf)
+
 공통
 
 - 성공: `{ "data": ... }`
