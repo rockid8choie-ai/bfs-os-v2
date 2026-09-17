@@ -29,6 +29,12 @@ export const signupSchema = z.object({
   phone: z.string().trim().max(20).default(""),
 });
 
+export const socialSignupSchema = z.object({
+  token: z.string().min(1),
+  buildingName: z.string().trim().min(2, "빌딩 이름을 2자 이상 입력해 주세요.").max(60),
+  name: z.string().trim().min(2, "이름을 2자 이상 입력해 주세요.").max(30).optional(),
+});
+
 export const updateProfileSchema = z.object({
   name: z.string().trim().min(2, "이름을 2자 이상 입력해 주세요.").max(30).optional(),
   title: z.string().trim().min(1).max(30).optional(),
@@ -37,12 +43,14 @@ export const updateProfileSchema = z.object({
 });
 
 export const changePasswordSchema = z.object({
-  currentPassword: z.string().min(1, "현재 비밀번호를 입력해 주세요."),
+  // 소셜 가입 계정은 비밀번호가 없어서 현재 비밀번호 없이 새로 만들 수 있다.
+  currentPassword: z.string().optional(),
   newPassword: password,
 });
 
 export const deleteAccountSchema = z.object({
-  password: z.string().min(1, "비밀번호를 입력해 주세요."),
+  // 소셜 가입 계정은 비밀번호가 없어서 확인 문구만 받는다.
+  password: z.string().optional(),
   confirm: z.literal("탈퇴", { message: "확인 문구로 '탈퇴'를 입력해 주세요." }),
 });
 

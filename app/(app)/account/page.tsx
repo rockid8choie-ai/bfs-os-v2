@@ -159,23 +159,32 @@ function ProfileSection() {
 }
 
 function PasswordSection() {
-  const { changePassword, loading } = useApp();
+  const { me, changePassword, loading } = useApp();
   const [current, setCurrent] = useState("");
   const [next, setNext] = useState("");
   const [msg, setMsg] = useState<{ tone: "ok" | "danger"; text: string } | null>(null);
 
+  // 소셜 가입 계정은 비밀번호가 없다 — 현재 비밀번호 없이 새로 만든다.
+  const hasPassword = me?.hasPassword !== false;
+
   return (
-    <Section title="비밀번호 변경" delay={60}>
+    <Section title={hasPassword ? "비밀번호 변경" : "비밀번호 만들기"} delay={60}>
+      {!hasPassword && (
+        <p className="mb-3 text-[13px] leading-relaxed text-sub">
+          소셜 로그인으로 가입한 계정입니다. 비밀번호를 만들어두면 이메일로도 로그인할 수
+          있어요.
+        </p>
+      )}
       <form
         className="space-y-3"
         onSubmit={async (e) => {
           e.preventDefault();
           setMsg(null);
           try {
-            await changePassword(current, next);
+            await changePassword(hasPassword ? current : undefined, next);
             setCurrent("");
             setNext("");
-            setMsg({ tone: "ok", text: "비밀번호를 변경했습니다." });
+            setMsg({ tone: "ok", text: hasPassword ? "비밀번호를 변경했습니다." : "비밀번호를 만들었습니다." });
           } catch (err) {
             setMsg({
               tone: "danger",
@@ -184,6 +193,7 @@ function PasswordSection() {
           }
         }}
       >
+        {hasPassword && (
         <label className="block">
           <span className={label}>현재 비밀번호</span>
           <input
@@ -195,6 +205,7 @@ function PasswordSection() {
             className={field}
           />
         </label>
+        )}
         <label className="block">
           <span className={label}>새 비밀번호 (8자 이상)</span>
           <input
@@ -208,7 +219,7 @@ function PasswordSection() {
           />
         </label>
         <button type="submit" disabled={loading} className={primaryBtn}>
-          변경하기
+          {hasPassword ? "변경하기" : "만들기"}
         </button>
       </form>
       {msg && <Notice tone={msg.tone} text={msg.text} />}
@@ -381,6 +392,7 @@ function DangerSection() {
   const [error, setError] = useState<string | null>(null);
 
   const isManager = me?.role === "manager";
+  const hasPassword = me?.hasPassword !== false;
 
   return (
     <Section title="계정 탈퇴" delay={180}>
@@ -401,13 +413,14 @@ function DangerSection() {
               return;
             }
             try {
-              await deleteAccount(password);
+              await deleteAccount(hasPassword ? password : undefined);
               router.replace("/login");
             } catch (err) {
               setError(err instanceof Error ? err.message : "탈퇴에 실패했습니다.");
             }
           }}
         >
+          {hasPassword && (
           <label className="block">
             <span className={label}>비밀번호</span>
             <input
@@ -419,6 +432,7 @@ function DangerSection() {
               className={field}
             />
           </label>
+          )}
           <label className="block">
             <span className={label}>확인 문구 — “탈퇴”를 입력하세요</span>
             <input value={confirm} onChange={(e) => setConfirm(e.target.value)} required className={field} />

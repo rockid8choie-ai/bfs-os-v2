@@ -27,7 +27,7 @@ interface NewOrderInput {
   autoAssign?: boolean;
 }
 
-type PublicUser = Member & { email?: string; buildingName?: string };
+type PublicUser = Member & { email?: string; buildingName?: string; hasPassword?: boolean };
 
 interface SignupInput {
   buildingName: string;
@@ -81,8 +81,8 @@ interface AppState {
   logout: () => Promise<void>;
   refresh: () => Promise<void>;
   updateProfile: (input: ProfileInput) => Promise<void>;
-  changePassword: (currentPassword: string, newPassword: string) => Promise<void>;
-  deleteAccount: (password: string) => Promise<void>;
+  changePassword: (currentPassword: string | undefined, newPassword: string) => Promise<void>;
+  deleteAccount: (password?: string) => Promise<void>;
   addMember: (input: NewMemberInput) => Promise<void>;
   removeMember: (id: string) => Promise<void>;
 
@@ -262,7 +262,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   );
 
   const changePassword = useCallback(
-    async (currentPassword: string, newPassword: string) => {
+    async (currentPassword: string | undefined, newPassword: string) => {
       await run(async () => {
         await api.post("/api/auth/password", { currentPassword, newPassword });
       });
@@ -271,7 +271,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   );
 
   const deleteAccount = useCallback(
-    async (password: string) => {
+    async (password?: string) => {
       await run(async () => {
         await api.del("/api/auth/me", { password, confirm: "탈퇴" });
         setMe(null);

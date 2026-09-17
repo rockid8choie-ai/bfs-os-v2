@@ -5,6 +5,7 @@ import {
   requireUser,
   SESSION_COOKIE,
   toPublicUser,
+  toSession,
   verifyPassword,
 } from "@/lib/server/auth";
 import { badRequest, jsonError, jsonOk } from "@/lib/server/errors";
@@ -43,20 +44,7 @@ export async function PATCH(request: Request) {
       include: { building: true },
     });
 
-    return jsonOk({
-      user: toPublicUser({
-        id: updated.id,
-        email: updated.email,
-        name: updated.name,
-        role: updated.role,
-        title: updated.title,
-        phone: updated.phone,
-        years: updated.years,
-        specialty: updated.specialties,
-        buildingId: updated.buildingId,
-        buildingName: updated.building.name,
-      }),
-    });
+    return jsonOk({ user: toPublicUser(toSession(updated)) });
   } catch (error) {
     return jsonError(error);
   }
@@ -70,8 +58,13 @@ export async function DELETE(request: Request) {
     const body = parseBody(deleteAccountSchema, raw);
 
     const account = await prisma.user.findUnique({ where: { id: me.id } });
-    if (!account || !(await verifyPassword(body.password, account.passwordHash))) {
-      throw badRequest("비밀번호가 올바르지 않습니다.", "WRONG_PASSWORD");
+    if (!account) throw badRequest("계정을 찾을 수 없습니다.");
+    // 비밀번호가 있는 계정만 비밀번호를 검증한다(소셜 가입 계정은 확인 문구만).
+    if (account.passwordHash) {
+      const ok = body.password
+        ? await verifyPassword(body.password, account.passwordHash)
+        : false;
+      if (!ok) throw badRequest("비밀번호가 올바르지 않습니다.", "WRONG_PASSWORD");
     }
 
     if (me.role === "manager") {

@@ -124,6 +124,10 @@
     <tr><td class="method delete">DELETE</td><td>/api/auth/me</td><td>필요</td><td>회원 탈퇴 — 소장은 빌딩 전체 삭제, 팀원은 본인만. body: { password, confirm: "탈퇴" }</td></tr>
     <tr><td class="method post">POST</td><td>/api/auth/password</td><td>필요</td><td>비밀번호 변경 { currentPassword, newPassword }</td></tr>
     <tr><td class="method post">POST</td><td>/api/auth/logout</td><td>—</td><td>세션 쿠키 삭제</td></tr>
+    <tr><td class="method get">GET</td><td>/api/auth/oauth/providers</td><td>불필요</td><td>활성화된 소셜 로그인 목록 (env 키 기준)</td></tr>
+    <tr><td class="method get">GET</td><td>/api/auth/oauth/:provider</td><td>불필요</td><td>소셜 로그인 시작 (kakao·google·naver) — 인가 화면으로 리다이렉트</td></tr>
+    <tr><td class="method get">GET</td><td>/api/auth/oauth/:provider/callback</td><td>불필요</td><td>콜백 — 기존 연결 로그인 / 이메일 자동 연결 / 신규는 /signup/social로</td></tr>
+    <tr><td class="method post">POST</td><td>/api/auth/social-signup</td><td>불필요</td><td>소셜 신규 가입 완료 { token, buildingName, name? }</td></tr>
     <tr><td class="method get">GET</td><td>/api/members</td><td>필요</td><td>같은 건물 구성원 목록</td></tr>
     <tr><td class="method post">POST</td><td>/api/members</td><td>필요(소장)</td><td>시설팀(tech) 계정 등록</td></tr>
     <tr><td class="method delete">DELETE</td><td>/api/members/:id</td><td>필요(소장)</td><td>팀원 삭제 — 배정 작업은 미배정으로</td></tr>

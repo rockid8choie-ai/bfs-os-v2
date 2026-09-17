@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import Logo from "@/components/Logo";
+import SocialLogin from "@/components/SocialLogin";
 import { DEMO_ACCOUNTS } from "@/lib/demo-accounts";
 import { useIsNativeApp } from "@/lib/native";
 import { useApp } from "@/lib/store";
@@ -19,7 +20,8 @@ function LoginForm() {
   const [email, setEmail] = useState<string>(DEMO_ACCOUNTS[0].email);
   const [password, setPassword] = useState<string>(DEMO_ACCOUNTS[0].password);
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  // 소셜 콜백 실패는 ?error= 로 돌아온다.
+  const [error, setError] = useState<string | null>(search.get("error"));
 
   if (ready && authenticated) {
     router.replace(dest);
@@ -101,6 +103,8 @@ function LoginForm() {
           우리 빌딩 시작하기
         </Link>
       </p>
+
+      <SocialLogin />
 
       {!native && (
       <div className="mt-8">

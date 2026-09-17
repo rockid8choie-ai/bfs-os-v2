@@ -1,13 +1,6 @@
-import { cookies } from "next/headers";
 import { Prisma, Role } from "@prisma/client";
 import { prisma } from "@/lib/server/db";
-import {
-  cookieOptions,
-  hashPassword,
-  SESSION_COOKIE,
-  signToken,
-  toPublicUser,
-} from "@/lib/server/auth";
+import { establishSession, hashPassword } from "@/lib/server/auth";
 import { badRequest, jsonError, jsonOk } from "@/lib/server/errors";
 import { parseBody, signupSchema } from "@/lib/server/validators";
 
@@ -49,33 +42,7 @@ export async function POST(request: Request) {
       throw error;
     }
 
-    const token = await signToken({
-      id: user.id,
-      role: user.role,
-      buildingId: user.buildingId,
-      email: user.email,
-    });
-    const jar = await cookies();
-    jar.set(SESSION_COOKIE, token, cookieOptions());
-
-    return jsonOk(
-      {
-        token,
-        user: toPublicUser({
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          role: user.role,
-          title: user.title,
-          phone: user.phone,
-          years: user.years,
-          specialty: user.specialties,
-          buildingId: user.buildingId,
-          buildingName: user.building.name,
-        }),
-      },
-      201
-    );
+    return jsonOk(await establishSession(user), 201);
   } catch (error) {
     return jsonError(error);
   }

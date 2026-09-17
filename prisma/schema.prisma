@@ -82,7 +82,8 @@ model User {
   buildingId       String
   building         Building    @relation(fields: [buildingId], references: [id], onDelete: Cascade)
   email            String      @unique
-  passwordHash     String
+  passwordHash     String?
+  oauthAccounts    OAuthAccount[]
   name             String
   role             Role
   title            String
@@ -136,6 +137,18 @@ model Voc {
   updatedAt  DateTime   @updatedAt
 
   @@index([buildingId, status])
+}
+
+model OAuthAccount {
+  id             String   @id @default(cuid())
+  provider       String
+  providerUserId String
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt      DateTime @default(now())
+
+  @@unique([provider, providerUserId])
+  @@index([userId])
 }
 
 model AssignmentEvent {

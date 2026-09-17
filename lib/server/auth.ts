@@ -19,7 +19,38 @@ export type SessionUser = {
   specialty: string[];
   buildingId: string;
   buildingName: string;
+  hasPassword: boolean;
 };
+
+type DbUserWithBuilding = {
+  id: string;
+  email: string;
+  passwordHash: string | null;
+  name: string;
+  role: Role;
+  title: string;
+  phone: string;
+  years: number;
+  specialties: string[];
+  buildingId: string;
+  building: { name: string };
+};
+
+export function toSession(user: DbUserWithBuilding): SessionUser {
+  return {
+    id: user.id,
+    email: user.email,
+    name: user.name,
+    role: user.role,
+    title: user.title,
+    phone: user.phone,
+    years: user.years,
+    specialty: user.specialties,
+    buildingId: user.buildingId,
+    buildingName: user.building.name,
+    hasPassword: Boolean(user.passwordHash),
+  };
+}
 
 export async function hashPassword(plain: string) {
   return bcrypt.hash(plain, 12);
@@ -54,18 +85,7 @@ export async function requireUser(): Promise<SessionUser> {
   });
   if (!user) throw unauthorized("계정을 찾을 수 없습니다.");
 
-  return {
-    id: user.id,
-    email: user.email,
-    name: user.name,
-    role: user.role,
-    title: user.title,
-    phone: user.phone,
-    years: user.years,
-    specialty: user.specialties,
-    buildingId: user.buildingId,
-    buildingName: user.building.name,
-  };
+  return toSession(user);
 }
 
 export function toPublicUser(user: SessionUser) {
@@ -80,5 +100,19 @@ export function toPublicUser(user: SessionUser) {
     buildingId: user.buildingId,
     buildingName: user.buildingName,
     email: user.email,
+    hasPassword: user.hasPassword,
   };
+}
+
+// 세션 쿠키 발급까지 한 번에 — 로그인·가입·소셜 콜백 공용.
+export async function establishSession(user: DbUserWithBuilding) {
+  const token = await signToken({
+    id: user.id,
+    role: user.role,
+    buildingId: user.buildingId,
+    email: user.email,
+  });
+  const jar = await cookies();
+  jar.set(SESSION_COOKIE, token, cookieOptions());
+  return { token, user: toPublicUser(toSession(user)) };
 }
