@@ -11,7 +11,7 @@ import {
 } from "react";
 import { api, ApiClientError } from "./api";
 import { recommend, type Recommendation } from "./assign";
-import { BUILDING, type Member, type Priority, type Role, type Specialty, type Voc, type WoStatus, type WorkOrder } from "./mock";
+import type { Member, Priority, Role, Specialty, Voc, WoStatus, WorkOrder } from "./mock";
 
 export type Filter = "전체" | WoStatus;
 
@@ -381,10 +381,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     [orders]
   );
 
-  const savedHours = useMemo(
-    () => BUILDING.savedHoursBase + Math.round(autoAssigned * 1.2),
-    [autoAssigned]
-  );
+  // 실데이터 기반 추정만 — 가짜 기본값 없음. 배정 1건당 분류·선정·연락 ~72분 절약 가정.
+  const savedHours = useMemo(() => Math.round(autoAssigned * 1.2), [autoAssigned]);
 
   const value: AppState = {
     ready,
@@ -431,7 +429,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     autoAssigned,
     savedHours,
     counts,
-    buildingName: me?.buildingName ?? BUILDING.name,
+    buildingName: me?.buildingName ?? "",
   };
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;

@@ -11,7 +11,6 @@ import {
   WrenchIcon,
 } from "@/components/icons";
 import { todayLabel } from "@/lib/dates";
-import { BUILDING } from "@/lib/mock";
 import { useApp } from "@/lib/store";
 
 type Tile = { Icon: (p: { className?: string; strokeWidth?: number }) => React.ReactNode; tile: string };
@@ -22,29 +21,6 @@ const KIND_STYLE: Record<string, Tile> = {
   work: { Icon: WrenchIcon, tile: "bg-tint-amber text-tint-amber-fg" },
   inspection: { Icon: CalendarCheckIcon, tile: "bg-tint-emerald text-tint-emerald-fg" },
 };
-
-function Sparkline({ data }: { data: readonly number[] }) {
-  const max = Math.max(...data);
-  return (
-    <svg viewBox={`0 0 ${data.length * 10 - 4} 32`} className="h-8 w-20">
-      {data.map((v, i) => {
-        const h = Math.max(4, (v / max) * 32);
-        const last = i === data.length - 1;
-        return (
-          <rect
-            key={i}
-            x={i * 10}
-            y={32 - h}
-            width="6"
-            height={h}
-            rx="3"
-            fill={last ? "#3182f6" : "rgba(255,255,255,0.22)"}
-          />
-        );
-      })}
-    </svg>
-  );
-}
 
 export default function Home() {
   const {
@@ -143,9 +119,15 @@ export default function Home() {
         <span className="rounded-full bg-brand-soft px-3 py-1.5 text-[12px] font-bold text-brand">
           {role === "manager" ? "오늘 챙길 일" : "오늘 내 작업"} {todayCount}건
         </span>
-        <span className="rounded-full bg-card px-3 py-1.5 text-[12px] font-bold text-ink2">
-          이번 주 처리율 {BUILDING.weeklyRate}%
-        </span>
+        {orders.length > 0 && (
+          <span className="rounded-full bg-card px-3 py-1.5 text-[12px] font-bold text-ink2">
+            처리율{" "}
+            {Math.round(
+              (orders.filter((o) => o.status === "완료").length / orders.length) * 100
+            )}
+            %
+          </span>
+        )}
       </div>
 
       <PipelineStrip />
@@ -220,26 +202,41 @@ export default function Home() {
         })}
       </div>
 
-      {role === "manager" && (
+      {role === "manager" && autoAssigned > 0 && (
         <div
           className="rise mt-5 flex items-center justify-between rounded-[20px] bg-gradient-to-br from-[#191f28] to-[#2c3542] px-5 py-4 text-white"
           style={{ animationDelay: `${feed.length * 70}ms` }}
         >
           <div>
             <div className="text-[12px] font-semibold text-white/55">
-              이번 주 BFS가 아낀 시간
+              BFS가 아낀 시간 (추정)
             </div>
             <div className="mt-0.5 text-[22px] font-extrabold tracking-tight">
               {savedHours}시간
             </div>
             <div className="mt-0.5 text-[11px] text-white/45">
-              AI 분류 · 자동 배정 {autoAssigned}건 · 리포트 자동화
+              AI 분류·배정 {autoAssigned}건 × 건당 약 72분 기준
             </div>
           </div>
-          <div className="flex flex-col items-end gap-1">
-            <Sparkline data={BUILDING.savedTrend} />
-            <span className="text-[10px] font-semibold text-white/45">최근 8주</span>
+          <div className="flex flex-col items-end gap-0.5">
+            <span className="text-[22px] font-extrabold text-white/90">
+              {orders.filter((o) => o.status === "완료").length}
+            </span>
+            <span className="text-[10px] font-semibold text-white/45">완료된 작업</span>
           </div>
+        </div>
+      )}
+
+      {role === "manager" && autoAssigned === 0 && (
+        <div
+          className="rise mt-5 rounded-[20px] bg-card px-5 py-4"
+          style={{ animationDelay: `${feed.length * 70}ms` }}
+        >
+          <div className="text-[13px] font-bold">아직 집계할 데이터가 없어요</div>
+          <p className="mt-1 text-[12px] leading-relaxed text-sub">
+            민원·작업이 접수되고 배정이 돌기 시작하면, BFS가 아껴준 시간이 여기에 실제
+            수치로 쌓입니다.
+          </p>
         </div>
       )}
 
