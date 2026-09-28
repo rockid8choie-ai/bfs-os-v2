@@ -29,7 +29,8 @@ const CONFIGS: Record<Provider, ProviderConfig> = {
     clientSecret: process.env.KAKAO_CLIENT_SECRET, // 카카오는 선택
     authorizeUrl: "https://kauth.kakao.com/oauth/authorize",
     tokenUrl: "https://kauth.kakao.com/oauth/token",
-    scope: "profile_nickname account_email",
+    // 이메일은 카카오 비즈 앱 전환 후에만 요청 가능 — 전환 시 "profile_nickname account_email"로 복원
+    scope: "profile_nickname",
     secretRequired: false,
   },
   google: {
