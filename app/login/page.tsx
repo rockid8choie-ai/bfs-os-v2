@@ -102,6 +102,10 @@ function LoginForm() {
         <Link href="/signup" className="font-bold text-brand">
           우리 빌딩 시작하기
         </Link>
+        <span className="mx-2 text-line">|</span>
+        <Link href="/reset" className="font-semibold text-ink2">
+          비밀번호 찾기
+        </Link>
       </p>
 
       <SocialLogin />

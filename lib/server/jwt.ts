@@ -33,6 +33,28 @@ export async function signToken(user: {
     .sign(jwtSecret());
 }
 
+// 비밀번호 재설정 토큰 — 30분 단기, 현재 해시 끝자락을 넣어 비번이 바뀌면 자동 무효(1회용 효과)
+export async function signResetToken(userId: string, passwordHash: string | null) {
+  return new SignJWT({ purpose: "pw-reset", ph: (passwordHash ?? "").slice(-10) })
+    .setProtectedHeader({ alg: "HS256" })
+    .setSubject(userId)
+    .setIssuedAt()
+    .setExpirationTime("30m")
+    .sign(jwtSecret());
+}
+
+export async function verifyResetToken(
+  token: string
+): Promise<{ userId: string; ph: string } | null> {
+  try {
+    const { payload } = await jwtVerify(token, jwtSecret());
+    if (payload.purpose !== "pw-reset" || !payload.sub) return null;
+    return { userId: payload.sub, ph: String(payload.ph ?? "") };
+  } catch {
+    return null;
+  }
+}
+
 export async function verifyToken(token: string): Promise<JwtPayload | null> {
   try {
     if (!process.env.JWT_SECRET) return null;

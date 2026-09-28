@@ -29,6 +29,13 @@ export const signupSchema = z.object({
   phone: z.string().trim().max(20).default(""),
 });
 
+export const resetRequestSchema = z.object({ email });
+
+export const resetConfirmSchema = z.object({
+  token: z.string().min(1),
+  newPassword: password,
+});
+
 export const socialSignupSchema = z.object({
   token: z.string().min(1),
   buildingName: z.string().trim().min(2, "빌딩 이름을 2자 이상 입력해 주세요.").max(60),
