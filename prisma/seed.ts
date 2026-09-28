@@ -4,6 +4,12 @@ import bcrypt from "bcryptjs";
 const prisma = new PrismaClient();
 
 async function main() {
+  // 안전장치: 데모 시드는 명시적 허용 시에만 — 프로덕션 재오염 방지 (2026-09-28 역삼타워 삭제 후)
+  if (process.env.ALLOW_SEED !== "1") {
+    console.error("시드는 데모 데이터를 생성합니다. 정말 실행하려면 ALLOW_SEED=1 로 다시 실행하세요.");
+    process.exit(1);
+  }
+
   const passwordHash = await bcrypt.hash("demo1234", 12);
 
   await prisma.assignmentEvent.deleteMany();
