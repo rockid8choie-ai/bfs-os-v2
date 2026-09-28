@@ -58,11 +58,108 @@ function platform() {
   return navigator.userAgent.includes("BFSOSApp") ? "ios_app" : "web";
 }
 
-/** 이벤트 전송 — 실패해도 앱 동작에 영향을 주지 않는다. */
+
+/* ── UTM 유입 어트리뷰션 ──
+   세션·최초유입 어트리뷰션은 GA4가 URL의 utm_*로 자동 처리한다(중복 전송 금지).
+   여기서는 GA가 이벤트 파라미터로 내려주지 않는 first-touch만 보존한다:
+   최초 방문 1회 저장(불변) → 이후 모든 이벤트에 ft_* 자동 첨부 + user_properties. */
+
+const FT_KEY = "bfs_first_touch";
+
+type FirstTouch = {
+  source: string;
+  medium: string;
+  campaign?: string;
+  content?: string;
+  term?: string;
+  id?: string;
+  landing?: string;
+  at?: string;
+};
+
+function readUtmFromUrl(): Partial<FirstTouch> | null {
+  const sp = new URLSearchParams(window.location.search);
+  const g = (k: string) => {
+    const v = sp.get(k)?.trim().toLowerCase();
+    return v || undefined; // 소문자 정규화 — taxonomy 혼용 방지
+  };
+  const source = g("utm_source");
+  const medium = g("utm_medium");
+  if (!source && !medium) return null;
+  return {
+    source: source ?? "(not set)",
+    medium: medium ?? "(not set)",
+    campaign: g("utm_campaign"),
+    content: g("utm_content"),
+    term: g("utm_term"),
+    id: g("utm_id"),
+  };
+}
+
+function setFirstTouchUserProps(ft: FirstTouch) {
+  if (!enabled()) return;
+  window.gtag!("set", "user_properties", {
+    first_touch_source: ft.source,
+    first_touch_medium: ft.medium,
+    ...(ft.campaign ? { first_touch_campaign: ft.campaign } : {}),
+  });
+}
+
+/** 최초 유입 캡처 — 저장된 값이 있으면 절대 덮어쓰지 않는다(first-touch 불변). */
+export function captureFirstTouch() {
+  if (typeof window === "undefined") return;
+  try {
+    const stored = localStorage.getItem(FT_KEY);
+    if (stored) {
+      setFirstTouchUserProps(JSON.parse(stored) as FirstTouch);
+      return;
+    }
+    const utm = readUtmFromUrl();
+    let ft: FirstTouch;
+    if (utm) {
+      ft = utm as FirstTouch;
+    } else {
+      // utm 없는 최초 방문도 기록해야 이후 광고 클릭이 first-touch를 못 덮는다
+      let refHost = "";
+      try {
+        refHost = document.referrer ? new URL(document.referrer).hostname : "";
+      } catch {
+        /* 무시 */
+      }
+      ft =
+        refHost && refHost !== window.location.hostname
+          ? { source: refHost, medium: "referral" }
+          : { source: "(direct)", medium: "(none)" };
+    }
+    ft.landing = window.location.pathname;
+    ft.at = new Date().toISOString();
+    localStorage.setItem(FT_KEY, JSON.stringify(ft));
+    setFirstTouchUserProps(ft);
+  } catch {
+    /* 저장 불가 환경(시크릿 등)에서도 앱 동작 무영향 */
+  }
+}
+
+function ftParams(): Record<string, string> {
+  try {
+    const raw = localStorage.getItem(FT_KEY);
+    if (!raw) return {};
+    const ft = JSON.parse(raw) as FirstTouch;
+    return {
+      ft_source: ft.source,
+      ft_medium: ft.medium,
+      ...(ft.campaign ? { ft_campaign: ft.campaign } : {}),
+    };
+  } catch {
+    return {};
+  }
+}
+
+/** 이벤트 전송 — first-touch(ft_*)와 플랫폼을 자동 첨부. 실패해도 앱 동작 무영향. */
 export function track(name: EventName, params: Record<string, ParamValue> = {}) {
   if (!enabled()) return;
   try {
-    window.gtag!("event", name, { ...params, app_platform: platform() });
+    window.gtag!("event", name, { ...ftParams(), ...params, app_platform: platform() });
   } catch {
     /* 무시 */
   }

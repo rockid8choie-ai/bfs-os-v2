@@ -3,7 +3,7 @@
 import Script from "next/script";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef } from "react";
-import { GA_ID, trackPageView } from "@/lib/analytics";
+import { captureFirstTouch, GA_ID, trackPageView } from "@/lib/analytics";
 
 /**
  * GA4 로더 + SPA page_view. NEXT_PUBLIC_GA_ID 없으면 아무것도 렌더하지 않는다.
@@ -16,6 +16,7 @@ export default function Analytics() {
   useEffect(() => {
     if (!GA_ID) return;
     // Script onLoad 이전 첫 렌더는 gtag 스텁(dataLayer push)이라도 안전하게 동작
+    captureFirstTouch();
     trackPageView(pathname);
     loaded.current = true;
   }, [pathname]);
