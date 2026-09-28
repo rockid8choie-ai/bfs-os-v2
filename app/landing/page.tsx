@@ -16,7 +16,7 @@ import Logo from "@/components/Logo";
 export const metadata: Metadata = {
   title: "BFS OS — 빌딩 시설 운영, 폰 하나로",
   description:
-    "민원·알람·점검을 한 줄로 접수하면 AI가 분류하고 담당자까지 배정합니다. 관리소장과 시설팀을 위한 빌딩 운영 OS. 지금 무료 체험 중.",
+    "민원·알람·점검을 한 줄로 접수하면 AI가 분류하고 담당자까지 배정합니다. 관리소장과 시설팀을 위한 빌딩 운영 OS. 지금 무료로 시작할 수 있습니다.",
 };
 
 const PROBLEMS = [
@@ -94,7 +94,7 @@ export default function LandingPage() {
             href="/login"
             className="min-h-[44px] rounded-xl bg-brand px-4 py-2.5 text-[13px] font-bold text-white transition-transform active:scale-95"
           >
-            무료로 체험하기
+            무료로 시작하기
           </Link>
         </div>
       </header>
@@ -121,7 +121,7 @@ export default function LandingPage() {
             href="/login"
             className="flex min-h-[48px] items-center gap-1 rounded-2xl bg-white px-6 py-3.5 text-[15px] font-bold text-[#191f28] transition-transform active:scale-95"
           >
-                무료로 체험하기
+                무료로 시작하기
                 <ChevronIcon className="h-4 w-4 opacity-50" strokeWidth={2.6} />
               </Link>
               <Link
@@ -338,20 +338,20 @@ export default function LandingPage() {
         <div className="rounded-[28px] bg-gradient-to-br from-[#191f28] to-[#2c3542] px-7 py-14 text-center text-white md:px-16">
           <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1.5 text-[12px] font-bold text-white/80">
             <SparkIcon className="h-3.5 w-3.5" strokeWidth={2.2} />
-            지금은 무료 체험 기간입니다
+            지금은 전부 무료입니다
           </span>
           <h2 className="mt-5 text-[28px] font-extrabold leading-snug tracking-[-0.03em] md:text-[38px]">
             상담 없이, 오늘 바로 시작하세요
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-[15px] leading-relaxed text-white/70">
             카드 등록 없이 모든 기능을 열어두고 있습니다. 빌딩 1개부터 쓰실 수 있고,
-            체험 중 쌓인 데이터와 이력은 그대로 유지됩니다.
+            쓰시는 동안 쌓인 데이터와 이력은 그대로 유지됩니다.
           </p>
           <Link
             href="/login"
             className="mt-8 inline-flex min-h-[48px] items-center gap-1 rounded-2xl bg-white px-8 py-4 text-[15px] font-bold text-[#191f28] transition-transform active:scale-95"
           >
-            무료로 체험하기
+            무료로 시작하기
             <ChevronIcon className="h-4 w-4 opacity-50" strokeWidth={2.6} />
           </Link>
           <p className="mt-4 text-[12.5px] text-white/45">
@@ -367,7 +367,7 @@ export default function LandingPage() {
             <span className="text-[12px] text-sub">Building Facility Service</span>
           </div>
           <div className="flex items-center gap-5 text-[12.5px] font-semibold text-sub">
-            <Link href="/login">앱 체험</Link>
+            <Link href="/login">앱 열기</Link>
             <Link href="/pricing">이용 안내</Link>
           </div>
         </div>

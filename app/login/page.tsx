@@ -5,13 +5,10 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import Logo from "@/components/Logo";
 import SocialLogin from "@/components/SocialLogin";
-import { DEMO_ACCOUNTS } from "@/lib/demo-accounts";
-import { useIsNativeApp } from "@/lib/native";
 import { useApp } from "@/lib/store";
 
 function LoginForm() {
   const { login, authenticated, ready } = useApp();
-  const native = useIsNativeApp();
   const router = useRouter();
   const search = useSearchParams();
   const next = search.get("next") || "/";
@@ -110,33 +107,6 @@ function LoginForm() {
 
       <SocialLogin />
 
-      {!native && (
-      <div className="mt-8">
-        <p className="px-1 text-[12px] font-bold text-sub">데모 — 누르면 바로 들어갑니다</p>
-        <div className="mt-2 overflow-hidden rounded-[20px] bg-card">
-          {DEMO_ACCOUNTS.map((a, i) => (
-            <button
-              key={a.email}
-              type="button"
-              disabled={busy}
-              onClick={() => void go(a.email, a.password)}
-              className={`flex min-h-[56px] w-full items-center justify-between px-4 py-3.5 text-left active:bg-line disabled:opacity-40 ${
-                i > 0 ? "border-t border-page" : ""
-              }`}
-            >
-              <span>
-                <span className="block text-[15px] font-bold">{a.label}</span>
-                <span className="mt-0.5 block text-[12px] text-sub">{a.email}</span>
-              </span>
-              <span className="shrink-0 rounded-full bg-brand-soft px-3 py-1.5 text-[12px] font-bold text-brand">
-                시작
-              </span>
-            </button>
-          ))}
-        </div>
-        <p className="mt-2 px-1 text-[11px] text-sub">비밀번호는 모두 demo1234 입니다.</p>
-      </div>
-      )}
 
       <p className="mt-auto pt-10 text-center text-[13px] font-semibold text-sub">
         <Link href="/landing" className="text-ink2">
