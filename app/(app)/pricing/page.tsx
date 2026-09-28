@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { CheckIcon, SparkIcon } from "@/components/icons";
+import { EV, track } from "@/lib/analytics";
 import { api } from "@/lib/api";
 import { useIsNativeApp } from "@/lib/native";
 import { BILLING_LIVE, PLANS, won, type PlanKey } from "@/lib/plans";
@@ -110,6 +111,7 @@ export default function PricingPage() {
         customerName?: string;
       }>("/api/billing/checkout", { plan });
 
+      track(EV.BEGIN_CHECKOUT, { currency: "KRW", value: order.amount, plan });
       const TossPayments = await loadTossPayments();
       const payment = TossPayments(order.clientKey).payment({
         customerKey: order.customerKey,

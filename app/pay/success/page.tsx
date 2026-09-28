@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useRef, useState } from "react";
+import { EV, track } from "@/lib/analytics";
 import { api } from "@/lib/api";
 import { PLANS, won, type PlanKey } from "@/lib/plans";
 
@@ -39,6 +40,14 @@ function SuccessInner() {
       .then((r) => {
         setResult(r);
         setState("done");
+        if (!r.alreadyPaid) {
+          track(EV.PURCHASE, {
+            currency: "KRW",
+            value: r.amount ?? amount,
+            plan: r.plan,
+            transaction_id: orderId,
+          });
+        }
       })
       .catch((err) => {
         setError(err instanceof Error ? err.message : "결제 승인에 실패했습니다.");

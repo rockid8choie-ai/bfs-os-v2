@@ -10,6 +10,7 @@ import {
   type ReactNode,
 } from "react";
 import { api, ApiClientError } from "./api";
+import { EV, setAnalyticsUser, track } from "./analytics";
 import { recommend, type Recommendation } from "./assign";
 import type { Member, Priority, Role, Specialty, Voc, WoStatus, WorkOrder } from "./mock";
 
@@ -183,6 +184,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     try {
       const { user } = await api.get<{ user: PublicUser }>("/api/auth/me");
       setMe(user);
+      setAnalyticsUser(user.id, user.role);
       await refresh();
     } catch (err) {
       setMe(null);
@@ -223,6 +225,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
           password,
         });
         setMe(user);
+        setAnalyticsUser(user.id, user.role);
+        track(EV.LOGIN, { method: "email" });
         await refresh();
       });
     },
@@ -234,6 +238,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
       await run(async () => {
         const { user } = await api.post<{ user: PublicUser }>("/api/auth/signup", input);
         setMe(user);
+        setAnalyticsUser(user.id, user.role);
+        track(EV.SIGN_UP, { method: "email" });
+        track(EV.BUILDING_REGISTERED, {});
         await refresh();
       });
     },
@@ -243,6 +250,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const logout = useCallback(async () => {
     await run(async () => {
       await api.post("/api/auth/logout");
+      setAnalyticsUser(null);
       setMe(null);
       setMembers([]);
       setOrders([]);
@@ -288,6 +296,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       await run(async () => {
         const { member } = await api.post<{ member: Member }>("/api/members", input);
         setMembers((prev) => [...prev, member]);
+        track(EV.MEMBER_ADDED, { specialties_count: input.specialties.length });
       });
     },
     [run]
@@ -314,6 +323,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
           assigneeId: memberId,
         });
         setOrders((prev) => prev.map((o) => (o.id === order.id ? order : o)));
+        track(EV.WORK_ORDER_ASSIGNED, { specialty: order.specialty ?? "미지정" });
       });
     },
     [run]
@@ -326,6 +336,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
           action: "advance",
         });
         setOrders((prev) => prev.map((o) => (o.id === order.id ? order : o)));
+        if (order.status === "진행중") {
+          track(EV.WORK_ORDER_STARTED, { specialty: order.specialty ?? "미지정" });
+        } else if (order.status === "완료") {
+          track(EV.WORK_ORDER_COMPLETED, { specialty: order.specialty ?? "미지정" });
+        }
         if (order.status === "완료" && order.vocId) {
           setVocs((prev) =>
             prev.map((v) => (v.id === order.vocId ? { ...v, status: "완료" } : v))
@@ -341,6 +356,17 @@ export function AppProvider({ children }: { children: ReactNode }) {
       return run(async () => {
         const { order } = await api.post<{ order: WorkOrder }>("/api/work-orders", input);
         setOrders((prev) => [order, ...prev.filter((o) => o.id !== order.id)]);
+        const source =
+          input.source === "AI 접수" ? "ai_intake" : input.vocId ? "voc_convert" : "manual";
+        track(EV.WORK_ORDER_CREATED, {
+          source,
+          specialty: input.specialty,
+          priority: input.priority,
+          auto_assign: Boolean(input.autoAssign ?? true),
+        });
+        if (source === "ai_intake") {
+          track(EV.AI_CLASSIFICATION_USED, { specialty: input.specialty });
+        }
         return order;
       });
     },
@@ -353,6 +379,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
         const { order, voc } = await api.post<{ order: WorkOrder; voc: Voc }>(
           `/api/vocs/${vocId}/convert`
         );
+        track(EV.WORK_ORDER_CREATED, {
+          source: "voc_convert",
+          specialty: order.specialty ?? "미지정",
+          priority: order.priority,
+          auto_assign: false,
+        });
         setOrders((prev) => {
           const rest = prev.filter((o) => o.id !== order.id);
           return [order, ...rest];

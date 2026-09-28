@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import Logo from "@/components/Logo";
+import { EV, track } from "@/lib/analytics";
 import { api } from "@/lib/api";
 
 function SocialSignupForm() {
@@ -29,6 +30,8 @@ function SocialSignupForm() {
         buildingName,
         ...(name.trim() ? { name: name.trim() } : {}),
       });
+      track(EV.SIGN_UP, { method: "social" });
+      track(EV.BUILDING_REGISTERED, {});
       // 전체 리로드로 스토어를 새 세션으로 부트스트랩한다.
       window.location.replace("/");
     } catch (err) {

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useRef } from "react";
 import Avatar from "@/components/Avatar";
 import PipelineStrip from "@/components/PipelineStrip";
 import {
@@ -10,6 +11,7 @@ import {
   MessageIcon,
   WrenchIcon,
 } from "@/components/icons";
+import { EV, track } from "@/lib/analytics";
 import { todayLabel } from "@/lib/dates";
 import { useApp } from "@/lib/store";
 
@@ -22,9 +24,20 @@ const KIND_STYLE: Record<string, Tile> = {
   inspection: { Icon: CalendarCheckIcon, tile: "bg-tint-emerald text-tint-emerald-fg" },
 };
 
+function useDashboardViewed(role: string, ready: boolean) {
+  const fired = useRef(false);
+  useEffect(() => {
+    if (ready && !fired.current) {
+      fired.current = true;
+      track(EV.DASHBOARD_VIEWED, { user_role: role });
+    }
+  }, [ready, role]);
+}
+
 export default function Home() {
   const {
     role,
+    ready,
     me,
     orders,
     vocs,
@@ -36,6 +49,8 @@ export default function Home() {
     autoAssigned,
     buildingName,
   } = useApp();
+
+  useDashboardViewed(role, ready);
 
   const unassigned = orders.filter((o) => !o.assigneeId && o.status !== "완료");
   const newVocs = vocs.filter((v) => v.status === "접수");

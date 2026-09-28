@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import Analytics from "@/components/Analytics";
 import { AppProvider } from "@/lib/store";
 
 export const metadata: Metadata = {
@@ -29,6 +30,7 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-full">
+        <Analytics />
         {/* 앱(폰 프레임)과 랜딩(풀와이드)이 같은 상태를 공유한다 */}
         <AppProvider>{children}</AppProvider>
       </body>
