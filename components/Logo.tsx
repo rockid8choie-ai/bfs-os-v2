@@ -11,7 +11,7 @@ export default function Logo({
     <span className="inline-flex items-center gap-1.5">
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src="/bfs-wordmark.svg"
+        src="/bfs-wordmark.png"
         alt="BFS"
         className={`logo-knockout w-auto ${compact ? "h-[18px]" : "h-[22px]"} ${
           invert ? "brightness-0 invert" : ""

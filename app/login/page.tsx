@@ -17,8 +17,8 @@ function LoginForm() {
   const next = search.get("next") || "/";
   const dest = next.startsWith("/") ? next : "/";
 
-  const [email, setEmail] = useState<string>(DEMO_ACCOUNTS[0].email);
-  const [password, setPassword] = useState<string>(DEMO_ACCOUNTS[0].password);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   // 소셜 콜백 실패는 ?error= 로 돌아온다.
   const [error, setError] = useState<string | null>(search.get("error"));
