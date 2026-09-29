@@ -65,7 +65,7 @@ export default function Fab() {
         title: text.trim(),
         priority: route.priority,
         specialty: route.specialty,
-        source: "AI 접수",
+        source: "한줄 접수",
         autoAssign: true,
       });
       setResult({ orderId: order.id, assigneeId: order.assigneeId });
@@ -104,7 +104,7 @@ export default function Fab() {
               <>
                 <h2 className="text-lg font-bold">무엇이든 접수</h2>
                 <p className="mt-1 text-sm text-sub">
-                  사진 찍고 한 줄만 쓰면, 분류부터 담당자 배정까지 AI가 합니다.
+                  사진 찍고 한 줄만 쓰면, 분류부터 담당자 배정까지 자동으로 됩니다.
                 </p>
                 <button className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-card py-6 text-sm font-semibold text-sub">
                   <CameraIcon className="h-5 w-5" strokeWidth={2} />

@@ -12,7 +12,7 @@ import { loadTossPayments } from "@/lib/toss";
 
 const FREE_FEATURES = [
   "민원 접수 + 작업지시 무제한",
-  "AI 자동 분류 · 담당자 배정",
+  "자동 분류 · 담당자 배정",
   "시설팀 좌석 제한 없음",
   "입주사 포털 (요청 무제한)",
   "주간·월간 리포트 (준비 중)",

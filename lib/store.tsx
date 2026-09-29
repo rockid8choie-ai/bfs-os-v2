@@ -357,7 +357,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         const { order } = await api.post<{ order: WorkOrder }>("/api/work-orders", input);
         setOrders((prev) => [order, ...prev.filter((o) => o.id !== order.id)]);
         const source =
-          input.source === "AI 접수" ? "ai_intake" : input.vocId ? "voc_convert" : "manual";
+          input.source === "한줄 접수" || input.source === "AI 접수" ? "ai_intake" : input.vocId ? "voc_convert" : "manual";
         track(EV.WORK_ORDER_CREATED, {
           source,
           specialty: input.specialty,

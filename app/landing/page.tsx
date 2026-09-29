@@ -16,7 +16,7 @@ import Logo from "@/components/Logo";
 export const metadata: Metadata = {
   title: "BFS OS — 빌딩 시설 운영, 폰 하나로",
   description:
-    "민원·알람·점검을 한 줄로 접수하면 AI가 분류하고 담당자까지 배정합니다. 관리소장과 시설팀을 위한 빌딩 운영 OS. 지금 무료로 시작할 수 있습니다.",
+    "민원·알람·점검을 한 줄로 접수하면 분류부터 담당자 배정까지 자동으로 됩니다. 관리소장과 시설팀을 위한 빌딩 운영 OS. 지금 무료로 시작할 수 있습니다.",
 };
 
 const PROBLEMS = [
@@ -46,7 +46,7 @@ const STEPS = [
   },
   {
     n: "02",
-    title: "AI가 분류하고 배정",
+    title: "자동으로 분류하고 배정",
     body: "유형을 판단해 전문분야가 맞는 담당자에게, 지금 부하가 적은 순서로 배정합니다. 추천 이유도 함께 보여줍니다.",
     tag: "이게 핵심",
   },
@@ -61,7 +61,7 @@ const STEPS = [
 const FEATURES = [
   {
     Icon: SparkIcon,
-    title: "AI 만능 접수",
+    title: "만능 한 줄 접수",
     body: "유형을 몰라도 됩니다. 한 줄 쓰면 이슈·민원·작업으로 알아서 갈라집니다.",
   },
   {
@@ -112,7 +112,7 @@ export default function LandingPage() {
               <span className="text-[#6aa5ff]">폰 하나로</span> 끝냅니다.
             </h1>
             <p className="mt-5 max-w-lg text-[15px] leading-relaxed text-white/70 md:text-[17px]">
-              민원·알람·순찰 발견을 한 줄로 접수하면, AI가 유형을 분류하고
+              민원·알람·순찰 발견을 한 줄로 접수하면, 유형이 자동 분류되고
               <b className="font-bold text-white"> 담당자까지 배정</b>합니다. 소장은
               누가 무엇을 하는지 보고, 시설팀은 자기 일만 보면 됩니다.
             </p>

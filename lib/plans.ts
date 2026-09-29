@@ -13,7 +13,7 @@ export const PLANS: Record<
     label: "Free",
     monthly: 0,
     tagline: "빌딩 1개, 핵심 루프만",
-    features: ["AI 접수·분류", "작업 배정·처리", "민원 관리", "팀원 3명까지"],
+    features: ["자동 접수·분류", "작업 배정·처리", "민원 관리", "팀원 3명까지"],
   },
   standard: {
     label: "Standard",

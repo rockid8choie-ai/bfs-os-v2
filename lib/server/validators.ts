@@ -86,7 +86,7 @@ export const createOrderSchema = z.object({
   location: z.string().trim().max(80).optional(),
   priority,
   specialty,
-  source: z.string().trim().min(1).max(80).default("AI 접수"),
+  source: z.string().trim().min(1).max(80).default("한줄 접수"),
   due: z.string().trim().max(40).optional(),
   vocId: z.string().min(1).optional(),
   assigneeId: z.string().min(1).optional(),
