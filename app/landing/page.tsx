@@ -362,13 +362,19 @@ export default function LandingPage() {
 
       <footer className="border-t border-line">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-5 py-8">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2.5">
             <Logo compact />
-            <span className="text-[12px] text-sub">Building Facility Service</span>
+            <span className="text-[12px] leading-relaxed text-sub">
+              닌자보스걸 · 대표 최려원 · 사업자등록번호 730-29-01800
+              <br />
+              문의 rockid8choie@gmail.com
+            </span>
           </div>
           <div className="flex items-center gap-5 text-[12.5px] font-semibold text-sub">
             <Link href="/login">앱 열기</Link>
             <Link href="/pricing">이용 안내</Link>
+            <Link href="/terms">이용약관</Link>
+            <Link href="/privacy">개인정보처리방침</Link>
           </div>
         </div>
       </footer>

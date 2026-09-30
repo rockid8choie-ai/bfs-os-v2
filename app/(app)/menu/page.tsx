@@ -113,7 +113,12 @@ export default function MenuPage() {
         </div>
       </section>
 
-      <p className="mt-8 text-center text-xs text-sub">
+      <div className="mt-8 flex items-center justify-center gap-4 text-xs font-semibold text-sub">
+        <Link href="/terms">이용약관</Link>
+        <span className="text-line">·</span>
+        <Link href="/privacy">개인정보처리방침</Link>
+      </div>
+      <p className="mt-3 text-center text-xs text-sub">
         BFS OS — 접수·배정·처리. 나머지는 필요할 때.
       </p>
     </div>

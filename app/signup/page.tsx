@@ -124,6 +124,18 @@ export default function SignupPage() {
         >
           {busy ? "만드는 중…" : "무료로 시작하기"}
         </button>
+
+        <p className="px-1 text-center text-[12px] leading-relaxed text-sub">
+          가입하면{" "}
+          <Link href="/terms" className="font-semibold text-ink2 underline">
+            이용약관
+          </Link>
+          과{" "}
+          <Link href="/privacy" className="font-semibold text-ink2 underline">
+            개인정보처리방침
+          </Link>
+          에 동의하는 것으로 봅니다.
+        </p>
       </form>
 
       <p className="mt-6 text-center text-[13px] text-sub">
