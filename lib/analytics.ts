@@ -11,6 +11,8 @@
  * - 모든 이벤트에 app_platform(web|ios_app) 자동 부착 — iOS 셸은 UA에 BFSOSApp.
  */
 
+import { ampSetUser, ampSetUserProps, ampTrack } from "./amplitude";
+
 export const GA_ID = process.env.NEXT_PUBLIC_GA_ID ?? "";
 
 export const EV = {
@@ -28,6 +30,8 @@ export const EV = {
   WORK_ORDER_STARTED: "work_order_started",
   WORK_ORDER_COMPLETED: "work_order_completed",
   MEMBER_ADDED: "member_added",
+  // A/B 테스트 노출 — lib/experiments.ts가 기록
+  EXPERIMENT_VIEWED: "experiment_viewed",
 } as const;
 
 export type EventName = (typeof EV)[keyof typeof EV];
@@ -97,12 +101,13 @@ function readUtmFromUrl(): Partial<FirstTouch> | null {
 }
 
 function setFirstTouchUserProps(ft: FirstTouch) {
-  if (!enabled()) return;
-  window.gtag!("set", "user_properties", {
+  const props = {
     first_touch_source: ft.source,
     first_touch_medium: ft.medium,
     ...(ft.campaign ? { first_touch_campaign: ft.campaign } : {}),
-  });
+  };
+  if (enabled()) window.gtag!("set", "user_properties", props);
+  ampSetUserProps(props);
 }
 
 /** 최초 유입 캡처 — 저장된 값이 있으면 절대 덮어쓰지 않는다(first-touch 불변). */
@@ -157,31 +162,52 @@ function ftParams(): Record<string, string> {
 
 /** 이벤트 전송 — first-touch(ft_*)와 플랫폼을 자동 첨부. 실패해도 앱 동작 무영향. */
 export function track(name: EventName, params: Record<string, ParamValue> = {}) {
-  if (!enabled()) return;
-  try {
-    window.gtag!("event", name, { ...ftParams(), ...params, app_platform: platform() });
-  } catch {
-    /* 무시 */
+  const payload = { ...ftParams(), ...params, app_platform: platform() };
+  if (enabled()) {
+    try {
+      window.gtag!("event", name, payload);
+    } catch {
+      /* 무시 */
+    }
   }
+  ampTrack(name, payload);
 }
 
 /** SPA 라우트 전환용 page_view */
 export function trackPageView(path: string) {
-  if (!enabled()) return;
-  try {
-    window.gtag!("event", "page_view", { page_path: path, app_platform: platform() });
-  } catch {
-    /* 무시 */
+  const payload = { page_path: path, app_platform: platform() };
+  if (enabled()) {
+    try {
+      window.gtag!("event", "page_view", payload);
+    } catch {
+      /* 무시 */
+    }
   }
+  ampTrack("page_view", payload);
 }
 
 /** 로그인 사용자 컨텍스트 — 가명 ID와 역할만 */
 export function setAnalyticsUser(userId: string | null, role?: string) {
-  if (!enabled()) return;
-  try {
-    window.gtag!("config", GA_ID, { user_id: userId ?? undefined, send_page_view: false });
-    if (role) window.gtag!("set", "user_properties", { user_role: role });
-  } catch {
-    /* 무시 */
+  if (enabled()) {
+    try {
+      window.gtag!("config", GA_ID, { user_id: userId ?? undefined, send_page_view: false });
+      if (role) window.gtag!("set", "user_properties", { user_role: role });
+    } catch {
+      /* 무시 */
+    }
   }
+  ampSetUser(userId, role ? { user_role: role } : {});
+}
+
+/** A/B 배정 결과를 user property로 — 그룹별 퍼널·리텐션 분석의 근거가 된다. */
+export function setExperimentProperty(key: string, variant: string) {
+  const prop = { [`exp_${key}`]: variant };
+  if (enabled()) {
+    try {
+      window.gtag!("set", "user_properties", prop);
+    } catch {
+      /* 무시 */
+    }
+  }
+  ampSetUserProps(prop);
 }

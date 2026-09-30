@@ -12,6 +12,7 @@ import {
   WrenchIcon,
 } from "@/components/icons";
 import { EV, track } from "@/lib/analytics";
+import { useExperiment } from "@/lib/experiments";
 import { todayLabel } from "@/lib/dates";
 import { useApp } from "@/lib/store";
 
@@ -44,6 +45,7 @@ export default function Home() {
     visibleOrders,
     openAssign,
     openMember,
+    openIntake,
     memberById,
     savedHours,
     autoAssigned,
@@ -51,6 +53,14 @@ export default function Home() {
   } = useApp();
 
   useDashboardViewed(role, ready);
+
+  // A/B: 신규 빌딩(접수·민원 0건)의 빈 화면에서 첫 접수를 유도할지 — Activation 실험
+  const isFirstRun = ready && orders.length === 0 && vocs.length === 0;
+  const nudgeVariant = useExperiment(
+    "first_order_nudge",
+    isFirstRun && role === "manager"
+  );
+  const showNudge = isFirstRun && role === "manager" && nudgeVariant === "nudge";
 
   const unassigned = orders.filter((o) => !o.assigneeId && o.status !== "완료");
   const newVocs = vocs.filter((v) => v.status === "접수");
@@ -90,7 +100,7 @@ export default function Home() {
                   id: "voc",
                   kind: "voc" as const,
                   title: `새 민원 ${newVocs.length}건 — ${newVocs[0].tenant.split(" · ")[0]} 외`,
-                  detail: `입주사 포털 접수 · AI 분류: ${newVocs[0].aiTag}`,
+                  detail: `입주사 포털 접수 · 자동 분류: ${newVocs[0].aiTag}`,
                   cta: "민원 보기",
                   href: "/voc",
                 },
@@ -153,11 +163,29 @@ export default function Home() {
       </div>
 
       <div className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-2">
-        {feed.length === 0 && (
-          <div className="rounded-[20px] bg-card px-4 py-8 text-center text-sm text-sub md:col-span-2">
-            지금 처리할 일이 없어요
-          </div>
-        )}
+        {feed.length === 0 &&
+          (showNudge ? (
+            <div className="rounded-[20px] bg-brand-soft px-5 py-7 text-center md:col-span-2">
+              <div className="text-[15px] font-bold text-brand">
+                첫 접수를 해볼까요?
+              </div>
+              <p className="mx-auto mt-1.5 max-w-xs text-[13px] leading-relaxed text-ink2">
+                &ldquo;302호 천장에서 물이 새요&rdquo; 처럼 한 줄만 쓰면
+                <br />
+                유형 분류와 담당자 배정까지 자동으로 됩니다.
+              </p>
+              <button
+                onClick={openIntake}
+                className="mt-4 rounded-xl bg-brand px-5 py-3 text-sm font-bold text-white transition-transform active:scale-[0.98]"
+              >
+                첫 접수 해보기
+              </button>
+            </div>
+          ) : (
+            <div className="rounded-[20px] bg-card px-4 py-8 text-center text-sm text-sub md:col-span-2">
+              지금 처리할 일이 없어요
+            </div>
+          ))}
 
         {feed.map((f, i) => {
           const s = KIND_STYLE[f.kind];
