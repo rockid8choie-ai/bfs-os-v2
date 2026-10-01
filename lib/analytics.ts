@@ -30,6 +30,8 @@ export const EV = {
   WORK_ORDER_STARTED: "work_order_started",
   WORK_ORDER_COMPLETED: "work_order_completed",
   MEMBER_ADDED: "member_added",
+  // BFS 매치 브릿지 — 내부 처리 불가 → 외주 전환 (두 앱 통합 판단 근거)
+  OUTSOURCE_CLICKED: "outsource_clicked",
   // A/B 테스트 노출 — lib/experiments.ts가 기록
   EXPERIMENT_VIEWED: "experiment_viewed",
 } as const;

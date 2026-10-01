@@ -1,6 +1,9 @@
 "use client";
 
 import AssigneeRow from "@/components/AssigneeRow";
+import { SwapIcon } from "@/components/icons";
+import { EV, track } from "@/lib/analytics";
+import { outsourceLink } from "@/lib/bridge";
 import { useApp, type Filter } from "@/lib/store";
 import type { WoStatus } from "@/lib/mock";
 
@@ -107,6 +110,26 @@ export default function WorkOrdersPage() {
               >
                 완료 처리
               </button>
+            )}
+
+            {/* 내부 인력으로 안 되는 작업은 외주로 — BFS 매치에 내용이 채워진 채 열린다 */}
+            {role === "manager" && o.status !== "완료" && (
+              <a
+                href={outsourceLink(o)}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() =>
+                  track(EV.OUTSOURCE_CLICKED, {
+                    specialty: o.specialty ?? "미분류",
+                    status: o.status,
+                    priority: o.priority,
+                  })
+                }
+                className="mt-2 flex w-full items-center justify-center gap-1.5 rounded-xl py-2.5 text-[13px] font-bold text-sub transition-colors active:bg-page"
+              >
+                <SwapIcon className="h-4 w-4" strokeWidth={2.2} />
+                외주 업체에 견적 요청
+              </a>
             )}
           </div>
         ))}
